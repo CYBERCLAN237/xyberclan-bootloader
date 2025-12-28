@@ -32,6 +32,12 @@ cat << "EOF"
     ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
     
                               Boot Loader Installer
+
+                     Open Source Community Project by XYBERCLAN
+                          Developed by: psycho237-prog
+                     
+                     Join us: https://xyber-clan.vercel.app/
+                     GitHub:  https://github.com/CYBERCLAN237
 EOF
 echo -e "${NC}"
 
