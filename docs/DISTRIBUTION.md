@@ -8,9 +8,7 @@ To distribute this as an `apt` package for Debian-based systems:
 ### Launchpad PPA (Ubuntu/Parrot)
 1.  **Create a Launchpad Account**: Sign up at [launchpad.net](https://launchpad.net/).
 2.  **Create a PPA**: Go to your profile and click "Create a new PPA".
-3.  **Upload the Source**:
-    -   Build the source package: `debuild -S -sa`
-    -   Upload using `dput`: `dput ppa:your-username/ppa-name xyberclan-bootloader_1.0.0_source.changes`
+3.  **Follow the Detailed Guide**: See [docs/PPA_PUBLISHING.md](PPA_PUBLISHING.md) for step-by-step commands to generate keys and upload.
 4.  **Result**: Users can then install it using:
     ```bash
     sudo add-apt-repository ppa:your-username/ppa-name
