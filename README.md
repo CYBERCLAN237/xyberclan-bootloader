@@ -88,16 +88,17 @@ sudo ./scripts/uninstall.sh
 ```
 xyberclan-bootloader/
 ├── scripts/
-│   ├── install.sh          # Main installation script
-│   ├── uninstall.sh        # Removal script
-│   └── boot-animation.sh   # Boot animation generator
+│   ├── install.sh            # Main installation script
+│   ├── uninstall.sh          # Removal script
+│   ├── boot-animation.sh     # Boot animation generator
+│   └── poweroff-animation.sh # Power-off animation
 ├── assets/
-│   ├── xyberclan-logo.txt  # ASCII art logo
-│   └── animation-frames/   # Animation frame files
+│   ├── xyberclan-logo.txt    # ASCII art logo
+│   └── animation-frames/     # Animation frame files
 ├── config/
-│   ├── plymouth/           # Plymouth theme files
-│   └── grub/               # GRUB customization files
-└── docs/                   # Documentation
+│   ├── plymouth/             # Plymouth theme files
+│   └── grub/                 # GRUB customization files
+└── docs/                     # Documentation
 ```
 
 ## 🤝 Contributing
