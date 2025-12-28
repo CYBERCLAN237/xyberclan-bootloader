@@ -1,0 +1,33 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ]; then
+    echo "Activating XYBERCLAN Plymouth theme..."
+    if command -v plymouth-set-default-theme >/dev/null 2>&1; then
+        plymouth-set-default-theme xyberclan
+    fi
+
+    # Update initramfs
+    if command -v update-initramfs >/dev/null 2>&1; then
+        update-initramfs -u
+    fi
+
+    # Enable systemd service if it was installed
+    if [ -f "/lib/systemd/system/xyberclan-boot.service" ] || [ -f "/etc/systemd/system/xyberclan-boot.service" ]; then
+        systemctl daemon-reload
+        systemctl enable xyberclan-boot.service
+    fi
+    
+    # Branding GRUB
+    if [ -f "/etc/default/grub" ]; then
+       if ! grep -q "GRUB_DISTRIBUTOR.*XYBERCLAN" /etc/default/grub; then
+           sed -i 's/^GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="XYBERCLAN - for open minded"/' /etc/default/grub
+           if command -v update-grub >/dev/null 2>&1; then
+               update-grub
+           fi
+       fi
+    fi
+fi
+
+#DEBHELPER#
+exit 0

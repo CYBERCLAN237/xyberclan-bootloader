@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "remove" ]; then
+    echo "Deactivating XYBERCLAN Plymouth theme..."
+    
+    # Try to revert to default theme (usually 'spinner' or 'text' or 'bgrt')
+    if command -v plymouth-set-default-theme >/dev/null 2>&1; then
+        # Detect current default or just set to a safe one
+        plymouth-set-default-theme --reset || plymouth-set-default-theme spinner
+    fi
+
+    # Disable systemd service
+    if systemctl is-enabled xyberclan-boot.service >/dev/null 2>&1; then
+        systemctl disable xyberclan-boot.service
+    fi
+
+    # Revert GRUB branding
+    if [ -f "/etc/default/grub" ]; then
+        sed -i 's/^GRUB_DISTRIBUTOR="XYBERCLAN - for open minded"/GRUB_DISTRIBUTOR="$(lsb_release -i -s 2>\/dev\/null || echo Debian)"/' /etc/default/grub
+        if command -v update-grub >/dev/null 2>&1; then
+            update-grub
+        fi
+    fi
+fi
+
+#DEBHELPER#
+exit 0

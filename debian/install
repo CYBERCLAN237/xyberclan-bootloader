@@ -1,0 +1,5 @@
+build/xyberclan/* usr/share/plymouth/themes/xyberclan/
+scripts/boot-animation.sh usr/bin/
+scripts/poweroff-animation.sh usr/bin/
+scripts/install.sh usr/bin/xyberclan-bootloader-install
+scripts/uninstall.sh usr/bin/xyberclan-bootloader-uninstall

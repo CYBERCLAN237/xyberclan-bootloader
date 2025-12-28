@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Generate the Plymouth theme images and script
+	mkdir -p build/xyberclan
+	cp assets/xyberclan-logo.txt build/xyberclan/
+	# Source the script but run only the generator function
+	/usr/bin/python3 -c "import sys; sys.path.append('scripts'); from PIL import Image; print('Building theme...')"
+	# We'll use a simplified version of the generation logic for the build process
+	bash -c "source scripts/boot-animation.sh && generate_plymouth_theme build/xyberclan"
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf build/

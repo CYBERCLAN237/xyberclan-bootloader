@@ -1,0 +1,14 @@
+Source: xyberclan-bootloader
+Section: utils
+Priority: optional
+Maintainer: psycho237-prog <psychomarlon6@gmail.com>
+Build-Depends: debhelper-compat (= 13), python3, python3-pil
+Standards-Version: 4.5.1
+Homepage: https://github.com/CYBERCLAN237/xyberclan-bootloader
+
+Package: xyberclan-bootloader
+Architecture: all
+Depends: ${misc:Depends}, plymouth, python3, python3-pil
+Description: XYBERCLAN Custom Boot Animation and GRUB Branding
+ Custom Plymouth theme and GRUB styling for the XYBERCLAN community.
+ Includes high-quality ASCII-style animations and installation scripts.

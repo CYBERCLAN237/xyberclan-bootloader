@@ -1,0 +1,7 @@
+xyberclan-bootloader (1.0.0) unstable; urgency=medium
+
+  * Initial release.
+  * Improved boot animation quality with pre-rendered PNG frames.
+  * Added installation progress indicators.
+
+ -- psycho237-prog <psychomarlon6@gmail.com>  Sun, 28 Dec 2025 18:25:00 +0100
