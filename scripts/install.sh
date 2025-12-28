@@ -22,6 +22,46 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 # Backup directory
 BACKUP_DIR="/var/backups/xyberclan-bootloader"
 
+# UI Helper Functions
+show_progress() {
+    local percent=$1
+    local width=40
+    local filled=$((percent * width / 100))
+    local empty=$((width - filled))
+    
+    printf "\r${CYAN}Progress: [${GREEN}"
+    printf "%${filled}s" | tr ' ' '#'
+    printf "${NC}"
+    printf "%${empty}s" | tr ' ' ' '
+    printf "${CYAN}] %d%%${NC}" "$percent"
+    
+    if [ "$percent" -eq 100 ]; then
+        echo -e "\n"
+    fi
+}
+
+show_spinner() {
+    local pid=$1
+    local message="$2"
+    local spin='-\|/'
+    local i=0
+    
+    echo -n -e "${BLUE}$message... ${NC}"
+    while kill -0 "$pid" 2>/dev/null; do
+        i=$(((i + 1) % 4))
+        printf "\r${BLUE}%s... ${CYAN}%s${NC}" "$message" "${spin:$i:1}"
+        sleep 0.1
+    done
+    printf "\r${BLUE}%s... ${GREEN}Done!${NC}\n" "$message"
+}
+
+run_with_spinner() {
+    local message="$1"
+    shift
+    "$@" &
+    show_spinner "$!" "$message"
+}
+
 echo -e "${CYAN}"
 cat << "EOF"
     ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗██╗      █████╗ ███╗   ██╗
@@ -51,6 +91,7 @@ echo -e "${YELLOW}Installing XYBERCLAN Boot Loader...${NC}\n"
 
 # Detect distribution
 detect_distro() {
+    show_progress 5
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         DISTRO=$ID
@@ -60,6 +101,7 @@ detect_distro() {
         exit 1
     fi
     echo -e "${BLUE}Detected: $PRETTY_NAME${NC}"
+    show_progress 10
 }
 
 # Check for Plymouth
@@ -76,6 +118,7 @@ check_plymouth() {
 # Create backup
 create_backup() {
     echo -e "\n${YELLOW}Creating backup...${NC}"
+    show_progress 15
     mkdir -p "$BACKUP_DIR"
     
     if [ -d "/usr/share/plymouth/themes" ]; then
@@ -87,6 +130,7 @@ create_backup() {
     fi
     
     echo -e "${GREEN}✓ Backup created at $BACKUP_DIR${NC}"
+    show_progress 20
 }
 
 # Install Plymouth theme
@@ -97,13 +141,15 @@ install_plymouth_theme() {
     fi
     
     echo -e "\n${YELLOW}Installing Plymouth theme...${NC}"
+    show_progress 30
     
     THEME_DIR="/usr/share/plymouth/themes/xyberclan"
     mkdir -p "$THEME_DIR"
     
     # Generate Plymouth theme files
     source "$SCRIPT_DIR/boot-animation.sh"
-    generate_plymouth_theme "$THEME_DIR"
+    run_with_spinner "Generating theme components" generate_plymouth_theme "$THEME_DIR"
+    show_progress 50
     
     # Copy logo
     cp "$PROJECT_ROOT/assets/xyberclan-logo.txt" "$THEME_DIR/"
@@ -113,13 +159,12 @@ install_plymouth_theme() {
     
     # Update initramfs
     if command -v update-initramfs &> /dev/null; then
-        echo -e "${BLUE}Updating initramfs...${NC}"
-        update-initramfs -u
+        run_with_spinner "Updating initramfs (this may take a minute)" update-initramfs -u
     elif command -v dracut &> /dev/null; then
-        echo -e "${BLUE}Updating dracut...${NC}"
-        dracut -f
+        run_with_spinner "Updating dracut" dracut -f
     fi
     
+    show_progress 70
     echo -e "${GREEN}✓ Plymouth theme installed${NC}"
 }
 
@@ -131,6 +176,7 @@ customize_grub() {
     fi
     
     echo -e "\n${YELLOW}Customizing GRUB...${NC}"
+    show_progress 80
     
     # Add XYBERCLAN branding to GRUB
     if ! grep -q "GRUB_DISTRIBUTOR.*XYBERCLAN" /etc/default/grub; then
@@ -139,19 +185,21 @@ customize_grub() {
     
     # Update GRUB
     if command -v update-grub &> /dev/null; then
-        update-grub
+        run_with_spinner "Updating GRUB configuration" update-grub
     elif command -v grub2-mkconfig &> /dev/null; then
-        grub2-mkconfig -o /boot/grub2/grub.cfg
+        run_with_spinner "Updating GRUB configuration" grub2-mkconfig -o /boot/grub2/grub.cfg
     elif command -v grub-mkconfig &> /dev/null; then
-        grub-mkconfig -o /boot/grub/grub.cfg
+        run_with_spinner "Updating GRUB configuration" grub-mkconfig -o /boot/grub/grub.cfg
     fi
     
+    show_progress 95
     echo -e "${GREEN}✓ GRUB customized${NC}"
 }
 
 # Add systemd boot message
 add_systemd_message() {
     echo -e "\n${YELLOW}Adding systemd boot message...${NC}"
+    show_progress 90
     
     # Create a service that displays the XYBERCLAN logo
     cat > /etc/systemd/system/xyberclan-boot.service <<EOF
@@ -173,6 +221,7 @@ EOF
     systemctl daemon-reload
     systemctl enable xyberclan-boot.service
     
+    show_progress 100
     echo -e "${GREEN}✓ Systemd boot message added${NC}"
 }
 

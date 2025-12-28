@@ -301,6 +301,28 @@ animate_boot() {
 generate_plymouth_theme() {
     local theme_dir="$1"
     
+    # Check for Python 3 and PIL
+    if ! python3 -c "import PIL" 2>/dev/null; then
+        echo -e "${RED}Error: Python 3 PIL (Pillow) library not found.${NC}"
+        echo -e "${YELLOW}Please install it: sudo apt install python3-pil${NC}"
+        return 1
+    fi
+
+    # Find a suitable font
+    FONT_PATH="/usr/share/fonts/truetype/liberation2/LiberationMono-Regular.ttf"
+    if [ ! -f "$FONT_PATH" ]; then
+        # Try to find another mono font
+        FONT_PATH=$(find /usr/share/fonts -name "LiberationMono-Regular.ttf" -o -name "DejaVuSansMono.ttf" -o -name "FreeMono.ttf" 2>/dev/null | head -n 1)
+    fi
+    
+    if [ -z "$FONT_PATH" ] || [ ! -f "$FONT_PATH" ]; then
+        echo -e "${RED}Error: Could not find a suitable monospaced font.${NC}"
+        return 1
+    fi
+    
+    echo -e "${BLUE}Generating high-quality frame images using Python...${NC}"
+    echo -e "${GRAY}Using font: $FONT_PATH${NC}"
+
     cat > "$theme_dir/xyberclan.plymouth" <<'EOF'
 [Plymouth Theme]
 Name=XYBERCLAN
@@ -312,171 +334,161 @@ ImageDir=/usr/share/plymouth/themes/xyberclan
 ScriptFile=/usr/share/plymouth/themes/xyberclan/xyberclan.script
 EOF
 
-    # Start creating the script
+    # Python script to generate image
+    # We will write a small python helper
+    cat > "$theme_dir/gen_image.py" <<EOF
+import sys
+from PIL import Image, ImageDraw, ImageFont
+
+def generate_image(text, color, output_path, font_path, size=24):
+    # Dummy image to calculate text size
+    # We use a large canvas to ensure it fits
+    canvas_width = 1920
+    canvas_height = 1080
+    img = Image.new('RGBA', (canvas_width, canvas_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    try:
+        font = ImageFont.truetype(font_path, size)
+    except Exception as e:
+        print(f"Error loading font: {e}")
+        sys.exit(1)
+    
+    # Get text bounding box
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+    
+    # Add some padding
+    padding = 20
+    width = int(text_width + padding * 2)
+    height = int(text_height + padding * 2)
+    
+    # Create final image
+    # Ensure it's not zero size
+    if width <= 0: width = 100
+    if height <= 0: height = 100
+    
+    img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Draw text
+    draw.text((padding, padding), text, font=font, fill=color)
+    
+    img.save(output_path)
+
+if __name__ == "__main__":
+    # Args: text_file color output_file font_path
+    text_file = sys.argv[1]
+    color = sys.argv[2]
+    output_file = sys.argv[3]
+    font_path = sys.argv[4]
+    
+    with open(text_file, 'r') as f:
+        text = f.read()
+        
+    generate_image(text, color, output_file, font_path)
+EOF
+
+    # Generate PNGs for each frame
+    for i in {1..9}; do
+        varname="FRAME$i"
+        content="${!varname}"
+        
+        echo "$content" > "/tmp/xyber_frame_$i.txt"
+        
+        # Color: #33ff33 (Bright Green)
+        python3 "$theme_dir/gen_image.py" "/tmp/xyber_frame_$i.txt" "#33ff33" "$theme_dir/frame$i.png" "$FONT_PATH"
+        
+        if [ $i -eq 9 ]; then
+             # Glitch red: #ff3333
+             python3 "$theme_dir/gen_image.py" "/tmp/xyber_frame_$i.txt" "#ff3333" "$theme_dir/frame${i}_glitch.png" "$FONT_PATH"
+        fi
+        
+        rm "/tmp/xyber_frame_$i.txt"
+    done
+    
+    # Generate Slogan Image
+    echo "for open minded" > "/tmp/xyber_slogan.txt"
+    # Color: #33ccff (Cyan)
+    python3 "$theme_dir/gen_image.py" "/tmp/xyber_slogan.txt" "#33ccff" "$theme_dir/slogan.png" "$FONT_PATH"
+    rm "/tmp/xyber_slogan.txt"
+    
+    # Cleanup python script
+    rm "$theme_dir/gen_image.py"
+
+    # Write the Plymouth script
     cat > "$theme_dir/xyberclan.script" <<'EOF'
 # XYBERCLAN Plymouth Boot Animation Script
 
 Window.SetBackgroundTopColor(0.0, 0.0, 0.0);
 Window.SetBackgroundBottomColor(0.0, 0.0, 0.0);
 
-# Define the logo frames (multi-line ASCII art)
-# Plymouth doesn't support arrays of string arrays well, so we define lines flat
-EOF
+# Load images
+frame_images = [];
+for (i = 1; i <= 9; i++) {
+    frame_images[i] = Image("frame" + i + ".png");
+}
+frame9_glitch = Image("frame9_glitch.png");
+slogan_image = Image("slogan.png");
 
-    # Generate variable definitions for all 9 frames
-    # We will export the bash variables into the Plymouth script
-    # Each frame has ~6 lines. We will name them frameX_lineY
-    
-    for i in {1..9}; do
-        varname="FRAME$i"
-        content="${!varname}"
-        
-        # Split content into lines, removing empty first/last if perfectly formatted
-        line_idx=0
-        while IFS= read -r line; do
-            # Skip empty lines if they are just the wrapper newlines
-            if [[ -z "${line// }" ]] && [[ $line_idx -eq 0 ]]; then continue; fi
-            
-            # Escape double quotes and backslashes
-            safe_line="${line//\\/\\\\}"
-            safe_line="${safe_line//\"/\\\"}"
-            
-            # Write to script
-            echo "frame${i}_line${line_idx} = \"$safe_line\";" >> "$theme_dir/xyberclan.script"
-            line_idx=$((line_idx+1))
-        done <<< "$content"
-        echo "frame${i}_lines = $line_idx;" >> "$theme_dir/xyberclan.script"
-    done
+# Create Sprite
+logo_sprite = Sprite();
+slogan_sprite = Sprite(slogan_image);
+slogan_sprite.SetOpacity(0);
 
-    # Append the logic part of the script
-    cat >> "$theme_dir/xyberclan.script" <<'EOF'
-
-slogan_text = "for open minded";
-
-# Create sprites for the frames
-# We will create 6 sprite objects (max lines) that we update
-lines = 6;
-sprites = [];
-images = [];
-
-# Initialize sprites in center
-term_font = "Monospace 12";
-line_height = 20;
-start_y = Window.GetHeight() / 2 - (lines * line_height) / 2;
-
-for (i = 0; i < lines; i++) {
-   sprites[i] = Sprite();
-   sprites[i].SetX(Window.GetWidth() / 2 - 300); # Approximate centering for left-aligned ASCII
-   sprites[i].SetY(start_y + (i * line_height));
+# Center Calculation Function
+fun center_sprite(spr, img) {
+    spr.SetImage(img);
+    spr.SetX(Window.GetWidth() / 2 - img.GetWidth() / 2);
+    spr.SetY(Window.GetHeight() / 2 - img.GetHeight() / 2);
 }
 
-# Slogan
-slogan.image = Image.Text(slogan_text, 1.0, 1.0, 1.0, 1.0, "Monospace 16");
-slogan.sprite = Sprite(slogan.image);
-slogan.sprite.SetX(Window.GetWidth() / 2 - slogan.image.GetWidth() / 2);
-slogan.sprite.SetY(start_y + (lines * line_height) + 40);
-slogan.sprite.SetOpacity(0);
+# Initial State
+center_sprite(logo_sprite, frame_images[1]);
+
+# Position slogan below logo
+# We need to calculate position based on the final logo size essentially
+# But logo grows. We want slogan fixed relative to center.
+# Let's say 150 pixels below center.
+slogan_sprite.SetX(Window.GetWidth() / 2 - slogan_image.GetWidth() / 2);
+slogan_sprite.SetY(Window.GetHeight() / 2 + 120);
 
 progress = 0;
-frame_counter = 1;
+current_frame = 1;
 
 fun refresh_callback() {
-    progress += 1;
+    progress++;
     
-    # Animate frames (simulating typwriter/growth)
-    # Switch frame every 10 ticks
-    
-    if (progress % 8 == 0 && frame_counter <= 9) {
-        
-        # Construct variable name for line count
-        # In simple plymouth script we can't do dynamic variable access easily like Lines = eval("frame" + frame_counter + "_lines")
-        # So we use a big switch/if
-        
-        # We'll just define the text for the current frame
-        if (frame_counter == 1) { 
-            l0 = frame1_line0; l1 = frame1_line1; l2 = frame1_line2; l3 = frame1_line3; l4 = frame1_line4; l5 = frame1_line5; 
-        }
-        else if (frame_counter == 2) {
-             l0 = frame2_line0; l1 = frame2_line1; l2 = frame2_line2; l3 = frame2_line3; l4 = frame2_line4; l5 = frame2_line5; 
-        }
-        else if (frame_counter == 3) {
-             l0 = frame3_line0; l1 = frame3_line1; l2 = frame3_line2; l3 = frame3_line3; l4 = frame3_line4; l5 = frame3_line5; 
-        }
-        else if (frame_counter == 4) {
-             l0 = frame4_line0; l1 = frame4_line1; l2 = frame4_line2; l3 = frame4_line3; l4 = frame4_line4; l5 = frame4_line5; 
-        }
-        else if (frame_counter == 5) {
-             l0 = frame5_line0; l1 = frame5_line1; l2 = frame5_line2; l3 = frame5_line3; l4 = frame5_line4; l5 = frame5_line5; 
-        }
-        else if (frame_counter == 6) {
-             l0 = frame6_line0; l1 = frame6_line1; l2 = frame6_line2; l3 = frame6_line3; l4 = frame6_line4; l5 = frame6_line5; 
-        }
-        else if (frame_counter == 7) {
-             l0 = frame7_line0; l1 = frame7_line1; l2 = frame7_line2; l3 = frame7_line3; l4 = frame7_line4; l5 = frame7_line5; 
-        }
-        else if (frame_counter == 8) {
-             l0 = frame8_line0; l1 = frame8_line1; l2 = frame8_line2; l3 = frame8_line3; l4 = frame8_line4; l5 = frame8_line5; 
-        }
-        else {
-             l0 = frame9_line0; l1 = frame9_line1; l2 = frame9_line2; l3 = frame9_line3; l4 = frame9_line4; l5 = frame9_line5; 
-        }
-
-        # Render lines
-        # Green color: 0.2, 0.8, 0.2
-        sprites[0].SetImage(Image.Text(l0, 0.2, 0.8, 0.2, 1.0, term_font));
-        sprites[1].SetImage(Image.Text(l1, 0.2, 0.8, 0.2, 1.0, term_font));
-        sprites[2].SetImage(Image.Text(l2, 0.2, 0.8, 0.2, 1.0, term_font));
-        sprites[3].SetImage(Image.Text(l3, 0.2, 0.8, 0.2, 1.0, term_font));
-        sprites[4].SetImage(Image.Text(l4, 0.2, 0.8, 0.2, 1.0, term_font));
-        sprites[5].SetImage(Image.Text(l5, 0.2, 0.8, 0.2, 1.0, term_font));
-        
-        # Center them
-        for (i=0; i<6; i++) {
-             # We center based on image width of line 0 usually, but lines vary.
-             # Just set X to center minus half of typical width
-             # Better: Center each line? No, ASCII must align left.
-             # So we center the block.
-             w = sprites[i].GetImage().GetWidth();
-             if (w > 10) # Valid line
-                 sprites[i].SetX(Window.GetWidth() / 2 - (w/2));
-        }
-
-        if (frame_counter < 9)
-            frame_counter++;
+    # Animate frames every 8 ticks
+    if (progress % 8 == 0 && current_frame < 9) {
+        current_frame++;
+        center_sprite(logo_sprite, frame_images[current_frame]);
     }
     
-    # Reveal slogan after logo complete
-    if (frame_counter >= 9 && progress > 80) {
-        op = slogan.sprite.GetOpacity();
-        if (op < 1.0) slogan.sprite.SetOpacity(op + 0.05);
+    # Reveal slogan after logo finishes
+    if (current_frame == 9 && progress > 80) {
+        op = slogan_sprite.GetOpacity();
+        if (op < 1.0) slogan_sprite.SetOpacity(op + 0.05);
     }
     
-    # Glitch effect when done
-    if (frame_counter >= 9 && progress % 20 == 0) {
-        # Randomly tint the final frame
+    # Glitch effect on final frame
+    if (current_frame == 9 && progress % 20 == 0) {
         r = Math.Random();
-        if (r > 0.7) {
-            # Glitch color
-             sprites[0].SetImage(Image.Text(frame9_line0, 0.8, 0.2, 0.2, 1.0, term_font));
-             sprites[1].SetImage(Image.Text(frame9_line1, 0.8, 0.2, 0.2, 1.0, term_font));
-             sprites[2].SetImage(Image.Text(frame9_line2, 0.8, 0.2, 0.2, 1.0, term_font));
-             sprites[3].SetImage(Image.Text(frame9_line3, 0.8, 0.2, 0.2, 1.0, term_font));
-             sprites[4].SetImage(Image.Text(frame9_line4, 0.8, 0.2, 0.2, 1.0, term_font));
-             sprites[5].SetImage(Image.Text(frame9_line5, 0.8, 0.2, 0.2, 1.0, term_font));
+        if (r > 0.8) {
+            # Show glitch red version
+            center_sprite(logo_sprite, frame9_glitch);
         } else {
-            # Restore Green
-             sprites[0].SetImage(Image.Text(frame9_line0, 0.2, 0.8, 0.2, 1.0, term_font));
-             sprites[1].SetImage(Image.Text(frame9_line1, 0.2, 0.8, 0.2, 1.0, term_font));
-             sprites[2].SetImage(Image.Text(frame9_line2, 0.2, 0.8, 0.2, 1.0, term_font));
-             sprites[3].SetImage(Image.Text(frame9_line3, 0.2, 0.8, 0.2, 1.0, term_font));
-             sprites[4].SetImage(Image.Text(frame9_line4, 0.2, 0.8, 0.2, 1.0, term_font));
-             sprites[5].SetImage(Image.Text(frame9_line5, 0.2, 0.8, 0.2, 1.0, term_font));
+            # Restore green
+            center_sprite(logo_sprite, frame_images[9]);
         }
     }
 }
 
 Plymouth.SetRefreshFunction(refresh_callback);
 EOF
+
+    echo -e "${GREEN}Theme generation complete.${NC}"
 }
 
 # Export functions for use in other scripts
