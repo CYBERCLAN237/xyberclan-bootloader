@@ -1,3 +1,16 @@
+xyberclan-bootloader (1.0.1-1~noble) noble; urgency=medium
+
+  * New upstream release to fix tarball conflict and add build
+    dependencies
+
+ -- psycho237-prog <psychomarlon6@gmail.com>  Sun, 28 Dec 2025 22:23:26 +0100
+
+xyberclan-bootloader (1.0.0-2~noble) noble; urgency=medium
+
+  * Fix build failure: add missing font dependencies to Build-Depends
+
+ -- psycho237-prog <psychomarlon6@gmail.com>  Sun, 28 Dec 2025 22:03:26 +0100
+
 xyberclan-bootloader (1.0.0-1~noble) noble; urgency=medium
 
   * PPA release for Ubuntu Noble (24.04)

@@ -56,6 +56,8 @@ sudo add-apt-repository ppa:psycho237-prog/ppa
 sudo apt update
 sudo apt install xyberclan-bootloader
 ```
+> [!NOTE]
+> If you are on **Parrot OS** or **Debian** and `add-apt-repository` fails, follow the Manual Setup in [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
 
 ### 2. Manual Download (.deb)
 You can download pre-built packages from our **[Releases](https://github.com/CYBERCLAN237/xyberclan-bootloader/releases)** page.
@@ -91,7 +93,7 @@ sudo apt install devscripts debhelper python3-pil
 debuild -us -uc -b
 
 # 3. Install the resulting package
-sudo apt install ../xyberclan-bootloader_1.0.0_all.deb
+sudo apt install ../xyberclan-bootloader_1.0.1-1~noble_all.deb
 ```
 
 ## 🎯 Supported Distributions
