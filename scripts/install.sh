@@ -170,6 +170,30 @@ EOF
     echo -e "${GREEN}✓ Systemd boot message added${NC}"
 }
 
+# Test animation after installation
+test_animation() {
+    echo -e "\n${CYAN}Would you like to test the animations now? (No reboot required)${NC}"
+    echo "1) Test Boot Animation"
+    echo "2) Test Power-Off Animation"
+    echo "3) Skip testing"
+    read -p "Choice [1-3]: " test_choice
+    
+    case $test_choice in
+        1)
+            bash "$SCRIPT_DIR/boot-animation.sh"
+            ;;
+        2)
+            bash "$SCRIPT_DIR/poweroff-animation.sh"
+            ;;
+        3)
+            return
+            ;;
+        *)
+            echo -e "${YELLOW}Skipping test...${NC}"
+            ;;
+    esac
+}
+
 # Main installation
 main() {
     detect_distro
@@ -206,10 +230,13 @@ main() {
     
     echo -e "\n${GREEN}╔════════════════════════════════════════════╗${NC}"
     echo -e "${GREEN}║  Installation Complete!                    ║${NC}"
-    echo -e "${GREEN}║  Reboot to see your new XYBERCLAN boot     ║${NC}"
-    echo -e "${GREEN}║  animation in action!                      ║${NC}"
+    echo -e "${GREEN}║  The files are now in place.               ║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════════╝${NC}"
+    
+    test_animation
+    
     echo -e "\n${CYAN}for open minded${NC}\n"
+    echo -e "${YELLOW}Note: Changes to GRUB and Plymouth require a reboot to take full effect.${NC}"
 }
 
 main
