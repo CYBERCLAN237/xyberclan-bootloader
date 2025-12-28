@@ -48,9 +48,19 @@ Before installing, ensure your system meets these basic requirements:
   - `python3-pil`: Required to generate the high-quality animation frames.
     - *On Debian/Ubuntu/Parrot:* `sudo apt install python3-pil`
 
-## 🚀 Easy Installation (Quick Start)
+## 📦 Installation Options
 
-The easiest way to install is using our automation script. It will guide you through the process and show you a progress bar.
+### 1. Download Pre-built Package (Recommended)
+You can download the latest `.deb` package directly from our **[Releases](https://github.com/CYBERCLAN237/xyberclan-bootloader/releases)** page.
+
+1.  Download the `.deb` file.
+2.  Install it using:
+    ```bash
+    sudo apt install ./xyberclan-bootloader_*.deb
+    ```
+
+### 2. Easy Installation (Automation Script)
+If you prefer running a script directly:
 
 ```bash
 # 1. Download the code
