@@ -48,16 +48,25 @@ Before installing, ensure your system meets these basic requirements:
   - `python3-pil`: Required to generate the high-quality animation frames.
     - *On Debian/Ubuntu/Parrot:* `sudo apt install python3-pil`
 
-### 1. Professional PPA Installation (Ubuntu/Parrot / RECOMMENDED)
-Stay up to date automatically with our official PPA:
-
 ```bash
 sudo add-apt-repository ppa:psycho237-prog/ppa
 sudo apt update
 sudo apt install xyberclan-bootloader
 ```
-> [!NOTE]
-> If you are on **Parrot OS** or **Debian** and `add-apt-repository` fails, follow the Manual Setup in [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
+
+> [!TIP]
+> **On Parrot OS, Kali, or Debian:** If the command above fails, use our **Robust Manual Setup**:
+> ```bash
+> # 1. Register the PPA Key
+> gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 907A43D9264119F4
+> gpg --export 907A43D9264119F4 | sudo tee /etc/apt/keyrings/xyberclan.gpg > /dev/null
+> 
+> # 2. Add Source (Architecture-specific for stability)
+> echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/xyberclan.gpg] http://ppa.launchpad.net/psycho237-prog/ppa/ubuntu noble main" | sudo tee /etc/apt/sources.list.d/xyberclan.list
+> 
+> # 3. Install
+> sudo apt update && sudo apt install xyberclan-bootloader
+> ```
 
 ### 2. Manual Download (.deb)
 You can download pre-built packages from our **[Releases](https://github.com/CYBERCLAN237/xyberclan-bootloader/releases)** page.
