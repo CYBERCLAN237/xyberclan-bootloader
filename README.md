@@ -38,50 +38,59 @@ Perfect for XYBERCLAN community members who want to personalize their Linux boot
                               for open minded
 ```
 
-## 🔧 Quick Start
+## 📋 Requirements
 
-### Installation
+Before installing, ensure your system meets these basic requirements:
+- **Operating System**: Linux (Parrot, Debian, Ubuntu, Kali, Arch, Fedora, etc.)
+- **Permissions**: Root/sudo access
+- **Dependencies**: 
+  - `plymouth`: For the boot animation.
+  - `python3-pil`: Required to generate the high-quality animation frames.
+    - *On Debian/Ubuntu/Parrot:* `sudo apt install python3-pil`
+
+## 🚀 Easy Installation (Quick Start)
+
+The easiest way to install is using our automation script. It will guide you through the process and show you a progress bar.
 
 ```bash
-# Clone the repository
+# 1. Download the code
 git clone https://github.com/CYBERCLAN237/xyberclan-bootloader.git
 cd xyberclan-bootloader
 
-# Run the installation script
+# 2. Run the installer
 sudo ./scripts/install.sh
 ```
+*Follow the on-screen prompts. We recommend selecting **Option 4** for the full experience.*
 
-### Uninstallation
+## 📦 Professional Installation (Debian Package)
+
+If you are on Parrot OS, Debian, or Ubuntu, you can build a professional `.deb` package. This is safer and easier to manage.
 
 ```bash
-# Restore original boot configuration
-sudo ./scripts/uninstall.sh
+# 1. Install build tools
+sudo apt install devscripts debhelper python3-pil
+
+# 2. Build the package
+debuild -us -uc -b
+
+# 3. Install the resulting package
+sudo apt install ../xyberclan-bootloader_1.0.0_all.deb
 ```
-
-## 📋 Requirements
-
-- Linux operating system
-- Root/sudo access
-- One of the following boot loaders:
-  - Plymouth (recommended for modern systems)
-  - GRUB 2
-  - systemd-boot
 
 ## 🎯 Supported Distributions
 
-- ✅ Ubuntu / Linux Mint
-- ✅ Fedora / RHEL / CentOS
-- ✅ Arch Linux / Manjaro
-- ✅ Debian
-- ✅ openSUSE
-- ✅ Pop!_OS
-- ✅ Most other systemd-based distributions
+- ✅ **Parrot Security OS** (Fully tested)
+- ✅ **Debian / Ubuntu / Kali / Pop!_OS**
+- ✅ **Arch Linux / Manjaro**
+- ✅ **Fedora / RHEL / CentOS**
+- ✅ **Most other Linux distros**
 
 ## 📚 Documentation
 
-- [Installation Guide](docs/INSTALLATION.md)
-- [Customization Options](docs/CUSTOMIZATION.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Detailed Installation Guide](docs/INSTALLATION.md) — Step-by-step for beginners.
+- [Distribution Guide](docs/DISTRIBUTION.md) — **NEW**: How to add this to PPA, AUR, and other package managers.
+- [Customization Options](docs/CUSTOMIZATION.md) — Change colors and styles.
+- [Troubleshooting](docs/TROUBLESHOOTING.md) — If things don't look right.
 
 ## 🛠️ Project Structure
 
