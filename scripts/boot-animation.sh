@@ -8,16 +8,21 @@
 set -e
 
 # Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-BRIGHT_GREEN='\033[1;32m'
-NC='\033[0m' # No Color
+if [ -t 1 ]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    MAGENTA='\033[0;35m'
+    CYAN='\033[0;36m'
+    WHITE='\033[1;37m'
+    GRAY='\033[0;90m'
+    BRIGHT_GREEN='\033[1;32m'
+    NC='\033[0m' # No Color
+else
+    # No colors if not a TTY (basic console fallback)
+    RED='' GREEN='' YELLOW='' BLUE='' MAGENTA='' CYAN='' WHITE='' GRAY='' BRIGHT_GREEN='' NC=''
+fi
 
 # Animation frames for XYBERCLAN (9 frames for better visibility)
 FRAME1="
@@ -119,7 +124,12 @@ BOOT_MESSAGES=(
 
 # Function to clear screen
 clear_screen() {
-    clear
+    # Fallback if 'clear' command is missing or fails
+    if command -v clear &> /dev/null; then
+        clear || echo -e "\033[H\033[2J"
+    else
+        echo -e "\033[H\033[2J"
+    fi
 }
 
 # Function to type text character by character (hacker effect)
@@ -302,29 +312,64 @@ ImageDir=/usr/share/plymouth/themes/xyberclan
 ScriptFile=/usr/share/plymouth/themes/xyberclan/xyberclan.script
 EOF
 
+    # Generate the Plymouth script with the logo
+    # Note: Plymouth scripts use a custom language. 
+    # We'll use the logo file we copy in install.sh
     cat > "$theme_dir/xyberclan.script" <<'EOF'
 # XYBERCLAN Plymouth Boot Animation Script
 
 Window.SetBackgroundTopColor(0.0, 0.0, 0.0);
 Window.SetBackgroundBottomColor(0.0, 0.0, 0.0);
 
-logo.image = Image.Text("XYBERCLAN", 0.2, 0.8, 1.0);
+# Load logo text from file (since Plymouth doesn't easily render multi-line ASCII)
+# But we can try to render the text with a hacker-like font if available
+# For now, we simulate the progressive reveal
+
+logo_text = "XYBERCLAN";
+slogan_text = "for open minded";
+
+# Create sprites
+logo.image = Image.Text(logo_text, 0.2, 0.8, 0.2, 1.0, "Monospace 30");
 logo.sprite = Sprite(logo.image);
 logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
-logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2);
+logo.sprite.SetY(Window.GetHeight() / 2 - 50);
 
-slogan.image = Image.Text("for open minded", 0.4, 0.6, 0.8);
+slogan.image = Image.Text(slogan_text, 0.0, 0.8, 0.8, 1.0, "Monospace 16");
 slogan.sprite = Sprite(slogan.image);
 slogan.sprite.SetX(Window.GetWidth() / 2 - slogan.image.GetWidth() / 2);
 slogan.sprite.SetY(Window.GetHeight() / 2 + 50);
+slogan.sprite.SetOpacity(0);
 
 progress = 0;
+frame_counter = 0;
 
 fun refresh_callback() {
-    progress += 0.005;
-    if (progress > 1.0) progress = 0;
+    progress += 1;
     
-    logo.sprite.SetOpacity(Math.Sin(progress * 3.14159) * 0.5 + 0.5);
+    # Simulate the typing/glitch effect
+    if (progress % 10 == 0 && frame_counter < 9) {
+        frame_counter++;
+        current_text = "";
+        for (i = 0; i < frame_counter; i++) {
+            current_text += logo_text.CharAt(i);
+        }
+        logo.image = Image.Text(current_text, 0.2, 0.8, 0.2, 1.0, "Monospace 30");
+        logo.sprite.SetImage(logo.image);
+    }
+    
+    # Reveal slogan after logo
+    if (frame_counter >= 9 && progress > 150) {
+        slogan_opacity = slogan.sprite.GetOpacity();
+        if (slogan_opacity < 1.0) {
+            slogan.sprite.SetOpacity(slogan_opacity + 0.05);
+        }
+    }
+
+    # Pulse effect for full logo
+    if (frame_counter >= 9) {
+        pulse = Math.Sin(progress / 20) * 0.2 + 0.8;
+        logo.sprite.SetOpacity(pulse);
+    }
 }
 
 Plymouth.SetRefreshFunction(refresh_callback);

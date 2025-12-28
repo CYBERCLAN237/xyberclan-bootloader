@@ -7,18 +7,25 @@
 
 set -e
 
+# Debug mode (set to 1 to disable screen clearing for troubleshooting)
+DEBUG_MODE=0
+
 # Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-BRIGHT_GREEN='\033[1;32m'
-DARK_RED='\033[0;91m'
-NC='\033[0m' # No Color
+if [ -t 1 ]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    MAGENTA='\033[0;35m'
+    CYAN='\033[0;36m'
+    WHITE='\033[1;37m'
+    GRAY='\033[0;90m'
+    BRIGHT_GREEN='\033[1;32m'
+    DARK_RED='\033[0;91m'
+    NC='\033[0m' # No Color
+else
+    RED='' GREEN='' YELLOW='' BLUE='' MAGENTA='' CYAN='' WHITE='' GRAY='' BRIGHT_GREEN='' DARK_RED='' NC=''
+fi
 
 # Animation frames for XYBERCLAN (reverse order for shutdown - 9 frames)
 FRAME9="
@@ -106,7 +113,13 @@ SLOGAN="for open minded"
 
 # Function to clear screen
 clear_screen() {
-    clear
+    if [[ $DEBUG_MODE -eq 0 ]]; then
+        if command -v clear &> /dev/null; then
+            clear || echo -e "\033[H\033[2J"
+        else
+            echo -e "\033[H\033[2J"
+        fi
+    fi
 }
 
 # Function to display frame with intense glitch effect
@@ -184,9 +197,12 @@ display_slogan_fade() {
 # Main shutdown animation function
 animate_shutdown() {
     local delay="${1:-0.3}"
-    
-    clear_screen
-    
+
+    # Only clear screen at start if not in debug mode
+    if [[ $DEBUG_MODE -eq 0 ]]; then
+        clear_screen
+    fi
+
     # Shutdown header
     echo -e "${DARK_RED}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${DARK_RED}║                     XYBERCLAN SHUTDOWN SEQUENCE                            ║${NC}"
