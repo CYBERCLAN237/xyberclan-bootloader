@@ -20,8 +20,8 @@ BRIGHT_GREEN='\033[1;32m'
 DARK_RED='\033[0;91m'
 NC='\033[0m' # No Color
 
-# Animation frames for XYBERCLAN (reverse order for shutdown)
-FRAME4="
+# Animation frames for XYBERCLAN (reverse order for shutdown - 9 frames)
+FRAME9="
     ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗██╗      █████╗ ███╗   ██╗
     ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║     ██╔══██╗████╗  ██║
      ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║     ██║     ███████║██╔██╗ ██║
@@ -30,13 +30,58 @@ FRAME4="
     ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
 "
 
-FRAME3="
+FRAME8="
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗██╗      █████╗ 
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║     ██╔══██╗
+     ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║     ██║     ███████║
+     ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██║     ██║     ██╔══██║
+    ██╔╝ ██╗   ██║   ██████╔╝███████╗██║  ██║╚██████╗███████╗██║  ██║
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝
+"
+
+FRAME7="
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗██╗     
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║     
+     ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║     ██║     
+     ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██║     ██║     
+    ██╔╝ ██╗   ██║   ██████╔╝███████╗██║  ██║╚██████╗███████╗
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝
+"
+
+FRAME6="
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝
+     ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║     
+     ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██║     
+    ██╔╝ ██╗   ██║   ██████╔╝███████╗██║  ██║╚██████╗
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝
+"
+
+FRAME5="
     ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗ 
     ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗
      ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝
      ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗
     ██╔╝ ██╗   ██║   ██████╔╝███████╗██║  ██║
     ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝
+"
+
+FRAME4="
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝
+     ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  
+     ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  
+    ██╔╝ ██╗   ██║   ██████╔╝███████╗
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝
+"
+
+FRAME3="
+    ██╗  ██╗██╗   ██╗██████╗ 
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗
+     ╚███╔╝  ╚████╔╝ ██████╔╝
+     ██╔██╗   ╚██╔╝  ██╔══██╗
+    ██╔╝ ██╗   ██║   ██████╔╝
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ 
 "
 
 FRAME2="
@@ -138,7 +183,7 @@ display_slogan_fade() {
 
 # Main shutdown animation function
 animate_shutdown() {
-    local delay="${1:-0.4}"
+    local delay="${1:-0.3}"
     
     clear_screen
     
@@ -165,24 +210,54 @@ animate_shutdown() {
     
     clear_screen
     
-    # Frame 4 - Full logo with intense glitch
+    # Frame 9 - Full XYBERCLAN with intense glitch
     echo ""
-    display_frame_glitch_shutdown "$FRAME4" "$BRIGHT_GREEN" 4
+    display_frame_glitch_shutdown "$FRAME9" "$BRIGHT_GREEN" 4
     sleep "$delay"
     
-    # Frame 3 - Glitching away
+    # Frame 8 - XYBERCLA glitching away
+    clear_screen
+    echo ""
+    display_frame_glitch_shutdown "$FRAME8" "$GREEN" 3
+    sleep "$delay"
+    
+    # Frame 7 - XYBERCL glitching
+    clear_screen
+    echo ""
+    display_frame_glitch_shutdown "$FRAME7" "$CYAN" 3
+    sleep "$delay"
+    
+    # Frame 6 - XYBERC glitching
+    clear_screen
+    echo ""
+    display_frame_glitch_shutdown "$FRAME6" "$BLUE" 3
+    sleep "$delay"
+    
+    # Frame 5 - XYBER glitching
+    clear_screen
+    echo ""
+    display_frame_glitch_shutdown "$FRAME5" "$CYAN" 3
+    sleep "$delay"
+    
+    # Frame 4 - XYBE glitching
+    clear_screen
+    echo ""
+    display_frame_glitch_shutdown "$FRAME4" "$GREEN" 3
+    sleep "$delay"
+    
+    # Frame 3 - XYB glitching
     clear_screen
     echo ""
     display_frame_glitch_shutdown "$FRAME3" "$CYAN" 3
     sleep "$delay"
     
-    # Frame 2 - More glitching
+    # Frame 2 - XY glitching
     clear_screen
     echo ""
-    display_frame_glitch_shutdown "$FRAME2" "$BLUE" 3
+    display_frame_glitch_shutdown "$FRAME2" "$BLUE" 4
     sleep "$delay"
     
-    # Frame 1 - Final glitch
+    # Frame 1 - X final glitch
     clear_screen
     echo ""
     display_frame_glitch_shutdown "$FRAME1" "$MAGENTA" 4
@@ -225,7 +300,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     echo -e "${YELLOW}XYBERCLAN Power-Off Animation Demo${NC}"
     echo ""
     sleep 1
-    animate_shutdown 0.4
+    animate_shutdown 0.3
     echo ""
     echo -e "${GRAY}System powered off${NC}"
 fi

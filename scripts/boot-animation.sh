@@ -19,7 +19,7 @@ GRAY='\033[0;90m'
 BRIGHT_GREEN='\033[1;32m'
 NC='\033[0m' # No Color
 
-# Animation frames for XYBERCLAN
+# Animation frames for XYBERCLAN (9 frames for better visibility)
 FRAME1="
     ██╗  ██╗
     ╚██╗██╔╝
@@ -39,6 +39,24 @@ FRAME2="
 "
 
 FRAME3="
+    ██╗  ██╗██╗   ██╗██████╗ 
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗
+     ╚███╔╝  ╚████╔╝ ██████╔╝
+     ██╔██╗   ╚██╔╝  ██╔══██╗
+    ██╔╝ ██╗   ██║   ██████╔╝
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ 
+"
+
+FRAME4="
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝
+     ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  
+     ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  
+    ██╔╝ ██╗   ██║   ██████╔╝███████╗
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝
+"
+
+FRAME5="
     ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗ 
     ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗
      ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝
@@ -47,7 +65,34 @@ FRAME3="
     ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝
 "
 
-FRAME4="
+FRAME6="
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝
+     ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║     
+     ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██║     
+    ██╔╝ ██╗   ██║   ██████╔╝███████╗██║  ██║╚██████╗
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝
+"
+
+FRAME7="
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗██╗     
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║     
+     ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║     ██║     
+     ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██║     ██║     
+    ██╔╝ ██╗   ██║   ██████╔╝███████╗██║  ██║╚██████╗███████╗
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝
+"
+
+FRAME8="
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗██╗      █████╗ 
+    ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║     ██╔══██╗
+     ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║     ██║     ███████║
+     ██╔██╗   ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗██║     ██║     ██╔══██║
+    ██╔╝ ██╗   ██║   ██████╔╝███████╗██║  ██║╚██████╗███████╗██║  ██║
+    ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝
+"
+
+FRAME9="
     ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗██╗      █████╗ ███╗   ██╗
     ╚██╗██╔╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║     ██╔══██╗████╗  ██║
      ╚███╔╝  ╚████╔╝ ██████╔╝█████╗  ██████╔╝██║     ██║     ███████║██╔██╗ ██║
@@ -160,7 +205,7 @@ display_slogan() {
 
 # Main animation function (hacker style)
 animate_boot() {
-    local delay="${1:-0.6}"
+    local delay="${1:-0.4}"
     
     clear_screen
     
@@ -183,24 +228,49 @@ animate_boot() {
     
     clear_screen
     
-    # Frame 1 with glitch
+    # Frame 1 - X with glitch
     display_frame_glitch "$FRAME1" "$MAGENTA"
     sleep "$delay"
     
-    # Frame 2 with glitch
+    # Frame 2 - XY with glitch
     clear_screen
     display_frame_glitch "$FRAME2" "$BLUE"
     sleep "$delay"
     
-    # Frame 3 with glitch
+    # Frame 3 - XYB with glitch
     clear_screen
     display_frame_glitch "$FRAME3" "$CYAN"
     sleep "$delay"
     
-    # Frame 4 - final reveal
+    # Frame 4 - XYBE with glitch
+    clear_screen
+    display_frame_glitch "$FRAME4" "$GREEN"
+    sleep "$delay"
+    
+    # Frame 5 - XYBER with glitch
+    clear_screen
+    display_frame_glitch "$FRAME5" "$BRIGHT_GREEN"
+    sleep "$delay"
+    
+    # Frame 6 - XYBERC with glitch
+    clear_screen
+    display_frame_glitch "$FRAME6" "$CYAN"
+    sleep "$delay"
+    
+    # Frame 7 - XYBERCL with glitch
+    clear_screen
+    display_frame_glitch "$FRAME7" "$BLUE"
+    sleep "$delay"
+    
+    # Frame 8 - XYBERCLA with glitch
+    clear_screen
+    display_frame_glitch "$FRAME8" "$GREEN"
+    sleep "$delay"
+    
+    # Frame 9 - XYBERCLAN (full) - final reveal
     clear_screen
     echo ""
-    display_frame "$FRAME4" "$BRIGHT_GREEN"
+    display_frame "$FRAME9" "$BRIGHT_GREEN"
     echo ""
     
     # Type slogan character by character
@@ -271,7 +341,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     echo -e "${YELLOW}XYBERCLAN Boot Animation Demo${NC}"
     echo ""
     sleep 1
-    animate_boot 0.6
+    animate_boot 0.4
     echo ""
     echo -e "${GREEN}Animation complete!${NC}"
 fi
