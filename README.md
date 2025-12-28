@@ -15,13 +15,15 @@ Perfect for XYBERCLAN community members who want to personalize their Linux boot
 
 ## ✨ Features
 
-- 🎨 **Animated XYBERCLAN logo** during boot
+- 🎨 **Animated XYBERCLAN logo** during boot with hacker-style effects
+- 🔴 **Power-off animation** with glitchy shutdown sequence
 - 💬 **Custom slogan display**: "for open minded"
 - 🔧 **Multiple boot loader support**: Plymouth, GRUB, systemd-boot
 - 🐧 **Cross-distro compatibility**: Ubuntu, Fedora, Arch, Debian, and more
 - 📦 **Easy installation**: One-command setup
 - 🔄 **Safe uninstallation**: Restores original boot configuration
 - 🎭 **Customizable**: Adjust colors, timing, and animation style
+- 🖥️ **Hacker aesthetic**: Matrix effects, glitch transitions, system messages
 
 ## 📸 Preview
 
