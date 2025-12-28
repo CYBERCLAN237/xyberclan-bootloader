@@ -16,12 +16,12 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt update
-          sudo apt install -y debhelper devscripts python3-pil 
+          sudo apt install -y debhelper devscripts python3-pil fonts-liberation2
 
       - name: Build Debian Package
         run: |
-          # Build only the binary package
-          dpkg-buildpackage -us -uc -b
+          # Build only the binary package. Use -d to ignore build-dep check since we installed manually.
+          dpkg-buildpackage -us -uc -b -d
           # Move the package to current dir for artifact upload
           mv ../xyberclan-bootloader_*.deb .
 
