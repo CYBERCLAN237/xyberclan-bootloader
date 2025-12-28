@@ -312,63 +312,166 @@ ImageDir=/usr/share/plymouth/themes/xyberclan
 ScriptFile=/usr/share/plymouth/themes/xyberclan/xyberclan.script
 EOF
 
-    # Generate the Plymouth script with the logo
-    # Note: Plymouth scripts use a custom language. 
-    # We'll use the logo file we copy in install.sh
+    # Start creating the script
     cat > "$theme_dir/xyberclan.script" <<'EOF'
 # XYBERCLAN Plymouth Boot Animation Script
 
 Window.SetBackgroundTopColor(0.0, 0.0, 0.0);
 Window.SetBackgroundBottomColor(0.0, 0.0, 0.0);
 
-# Load logo text from file (since Plymouth doesn't easily render multi-line ASCII)
-# But we can try to render the text with a hacker-like font if available
-# For now, we simulate the progressive reveal
+# Define the logo frames (multi-line ASCII art)
+# Plymouth doesn't support arrays of string arrays well, so we define lines flat
+EOF
 
-logo_text = "XYBERCLAN";
+    # Generate variable definitions for all 9 frames
+    # We will export the bash variables into the Plymouth script
+    # Each frame has ~6 lines. We will name them frameX_lineY
+    
+    for i in {1..9}; do
+        varname="FRAME$i"
+        content="${!varname}"
+        
+        # Split content into lines, removing empty first/last if perfectly formatted
+        line_idx=0
+        while IFS= read -r line; do
+            # Skip empty lines if they are just the wrapper newlines
+            if [[ -z "${line// }" ]] && [[ $line_idx -eq 0 ]]; then continue; fi
+            
+            # Escape double quotes and backslashes
+            safe_line="${line//\\/\\\\}"
+            safe_line="${safe_line//\"/\\\"}"
+            
+            # Write to script
+            echo "frame${i}_line${line_idx} = \"$safe_line\";" >> "$theme_dir/xyberclan.script"
+            line_idx=$((line_idx+1))
+        done <<< "$content"
+        echo "frame${i}_lines = $line_idx;" >> "$theme_dir/xyberclan.script"
+    done
+
+    # Append the logic part of the script
+    cat >> "$theme_dir/xyberclan.script" <<'EOF'
+
 slogan_text = "for open minded";
 
-# Create sprites
-logo.image = Image.Text(logo_text, 0.2, 0.8, 0.2, 1.0, "Monospace 30");
-logo.sprite = Sprite(logo.image);
-logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
-logo.sprite.SetY(Window.GetHeight() / 2 - 50);
+# Create sprites for the frames
+# We will create 6 sprite objects (max lines) that we update
+lines = 6;
+sprites = [];
+images = [];
 
-slogan.image = Image.Text(slogan_text, 0.0, 0.8, 0.8, 1.0, "Monospace 16");
+# Initialize sprites in center
+term_font = "Monospace 12";
+line_height = 20;
+start_y = Window.GetHeight() / 2 - (lines * line_height) / 2;
+
+for (i = 0; i < lines; i++) {
+   sprites[i] = Sprite();
+   sprites[i].SetX(Window.GetWidth() / 2 - 300); # Approximate centering for left-aligned ASCII
+   sprites[i].SetY(start_y + (i * line_height));
+}
+
+# Slogan
+slogan.image = Image.Text(slogan_text, 1.0, 1.0, 1.0, 1.0, "Monospace 16");
 slogan.sprite = Sprite(slogan.image);
 slogan.sprite.SetX(Window.GetWidth() / 2 - slogan.image.GetWidth() / 2);
-slogan.sprite.SetY(Window.GetHeight() / 2 + 50);
+slogan.sprite.SetY(start_y + (lines * line_height) + 40);
 slogan.sprite.SetOpacity(0);
 
 progress = 0;
-frame_counter = 0;
+frame_counter = 1;
 
 fun refresh_callback() {
     progress += 1;
     
-    # Simulate the typing/glitch effect
-    if (progress % 10 == 0 && frame_counter < 9) {
-        frame_counter++;
-        current_text = "";
-        for (i = 0; i < frame_counter; i++) {
-            current_text += logo_text.CharAt(i);
+    # Animate frames (simulating typwriter/growth)
+    # Switch frame every 10 ticks
+    
+    if (progress % 8 == 0 && frame_counter <= 9) {
+        
+        # Construct variable name for line count
+        # In simple plymouth script we can't do dynamic variable access easily like Lines = eval("frame" + frame_counter + "_lines")
+        # So we use a big switch/if
+        
+        # We'll just define the text for the current frame
+        if (frame_counter == 1) { 
+            l0 = frame1_line0; l1 = frame1_line1; l2 = frame1_line2; l3 = frame1_line3; l4 = frame1_line4; l5 = frame1_line5; 
         }
-        logo.image = Image.Text(current_text, 0.2, 0.8, 0.2, 1.0, "Monospace 30");
-        logo.sprite.SetImage(logo.image);
+        else if (frame_counter == 2) {
+             l0 = frame2_line0; l1 = frame2_line1; l2 = frame2_line2; l3 = frame2_line3; l4 = frame2_line4; l5 = frame2_line5; 
+        }
+        else if (frame_counter == 3) {
+             l0 = frame3_line0; l1 = frame3_line1; l2 = frame3_line2; l3 = frame3_line3; l4 = frame3_line4; l5 = frame3_line5; 
+        }
+        else if (frame_counter == 4) {
+             l0 = frame4_line0; l1 = frame4_line1; l2 = frame4_line2; l3 = frame4_line3; l4 = frame4_line4; l5 = frame4_line5; 
+        }
+        else if (frame_counter == 5) {
+             l0 = frame5_line0; l1 = frame5_line1; l2 = frame5_line2; l3 = frame5_line3; l4 = frame5_line4; l5 = frame5_line5; 
+        }
+        else if (frame_counter == 6) {
+             l0 = frame6_line0; l1 = frame6_line1; l2 = frame6_line2; l3 = frame6_line3; l4 = frame6_line4; l5 = frame6_line5; 
+        }
+        else if (frame_counter == 7) {
+             l0 = frame7_line0; l1 = frame7_line1; l2 = frame7_line2; l3 = frame7_line3; l4 = frame7_line4; l5 = frame7_line5; 
+        }
+        else if (frame_counter == 8) {
+             l0 = frame8_line0; l1 = frame8_line1; l2 = frame8_line2; l3 = frame8_line3; l4 = frame8_line4; l5 = frame8_line5; 
+        }
+        else {
+             l0 = frame9_line0; l1 = frame9_line1; l2 = frame9_line2; l3 = frame9_line3; l4 = frame9_line4; l5 = frame9_line5; 
+        }
+
+        # Render lines
+        # Green color: 0.2, 0.8, 0.2
+        sprites[0].SetImage(Image.Text(l0, 0.2, 0.8, 0.2, 1.0, term_font));
+        sprites[1].SetImage(Image.Text(l1, 0.2, 0.8, 0.2, 1.0, term_font));
+        sprites[2].SetImage(Image.Text(l2, 0.2, 0.8, 0.2, 1.0, term_font));
+        sprites[3].SetImage(Image.Text(l3, 0.2, 0.8, 0.2, 1.0, term_font));
+        sprites[4].SetImage(Image.Text(l4, 0.2, 0.8, 0.2, 1.0, term_font));
+        sprites[5].SetImage(Image.Text(l5, 0.2, 0.8, 0.2, 1.0, term_font));
+        
+        # Center them
+        for (i=0; i<6; i++) {
+             # We center based on image width of line 0 usually, but lines vary.
+             # Just set X to center minus half of typical width
+             # Better: Center each line? No, ASCII must align left.
+             # So we center the block.
+             w = sprites[i].GetImage().GetWidth();
+             if (w > 10) # Valid line
+                 sprites[i].SetX(Window.GetWidth() / 2 - (w/2));
+        }
+
+        if (frame_counter < 9)
+            frame_counter++;
     }
     
-    # Reveal slogan after logo
-    if (frame_counter >= 9 && progress > 150) {
-        slogan_opacity = slogan.sprite.GetOpacity();
-        if (slogan_opacity < 1.0) {
-            slogan.sprite.SetOpacity(slogan_opacity + 0.05);
-        }
+    # Reveal slogan after logo complete
+    if (frame_counter >= 9 && progress > 80) {
+        op = slogan.sprite.GetOpacity();
+        if (op < 1.0) slogan.sprite.SetOpacity(op + 0.05);
     }
-
-    # Pulse effect for full logo
-    if (frame_counter >= 9) {
-        pulse = Math.Sin(progress / 20) * 0.2 + 0.8;
-        logo.sprite.SetOpacity(pulse);
+    
+    # Glitch effect when done
+    if (frame_counter >= 9 && progress % 20 == 0) {
+        # Randomly tint the final frame
+        r = Math.Random();
+        if (r > 0.7) {
+            # Glitch color
+             sprites[0].SetImage(Image.Text(frame9_line0, 0.8, 0.2, 0.2, 1.0, term_font));
+             sprites[1].SetImage(Image.Text(frame9_line1, 0.8, 0.2, 0.2, 1.0, term_font));
+             sprites[2].SetImage(Image.Text(frame9_line2, 0.8, 0.2, 0.2, 1.0, term_font));
+             sprites[3].SetImage(Image.Text(frame9_line3, 0.8, 0.2, 0.2, 1.0, term_font));
+             sprites[4].SetImage(Image.Text(frame9_line4, 0.8, 0.2, 0.2, 1.0, term_font));
+             sprites[5].SetImage(Image.Text(frame9_line5, 0.8, 0.2, 0.2, 1.0, term_font));
+        } else {
+            # Restore Green
+             sprites[0].SetImage(Image.Text(frame9_line0, 0.2, 0.8, 0.2, 1.0, term_font));
+             sprites[1].SetImage(Image.Text(frame9_line1, 0.2, 0.8, 0.2, 1.0, term_font));
+             sprites[2].SetImage(Image.Text(frame9_line2, 0.2, 0.8, 0.2, 1.0, term_font));
+             sprites[3].SetImage(Image.Text(frame9_line3, 0.2, 0.8, 0.2, 1.0, term_font));
+             sprites[4].SetImage(Image.Text(frame9_line4, 0.2, 0.8, 0.2, 1.0, term_font));
+             sprites[5].SetImage(Image.Text(frame9_line5, 0.2, 0.8, 0.2, 1.0, term_font));
+        }
     }
 }
 
