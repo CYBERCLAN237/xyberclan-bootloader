@@ -1,7 +1,8 @@
-xyberclan-bootloader (1.0.0) unstable; urgency=medium
+xyberclan-bootloader (1.0.0-1~noble) noble; urgency=medium
 
-  * Initial release.
-  * Improved boot animation quality with pre-rendered PNG frames.
-  * Added installation progress indicators.
+  * PPA release for Ubuntu Noble (24.04)
+  * High-quality animation with Python/PIL
+  * Progress-aware installation script
+  * Professional Debian packaging support
 
- -- psycho237-prog <psychomarlon6@gmail.com>  Sun, 28 Dec 2025 18:25:00 +0100
+ -- psycho237-prog <psychomarlon6@gmail.com>  Sun, 28 Dec 2025 20:46:35 +0100
