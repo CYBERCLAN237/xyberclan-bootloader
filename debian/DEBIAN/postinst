@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+# Post-installation script for xyberclan-bootloader
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  XYBERCLAN Bootloader - Post Installation"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "Thank you for installing XYBERCLAN Bootloader!"
+echo "An open source community project"
+echo ""
+echo "Next steps:"
+echo "  1. Run: sudo xyberclan-bootloader-install"
+echo "  2. Select your preferred installation method"
+echo "  3. Reboot to see the animations!"
+echo ""
+echo "For help: xyberclan-bootloader-install --help"
+echo "Community: https://xyber-clan.vercel.app/"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+exit 0

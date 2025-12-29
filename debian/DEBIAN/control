@@ -1,0 +1,22 @@
+Package: xyberclan-bootloader
+Version: 1.0.0
+Section: misc
+Priority: optional
+Architecture: all
+Depends: plymouth, plymouth-themes
+Recommends: grub-common
+Maintainer: psycho237-prog <psychomarlon6@gmail.com>
+Homepage: https://github.com/CYBERCLAN237/xyberclan-bootloader
+Description: Custom boot animation for XYBERCLAN community
+ XYBERCLAN Bootloader provides hacker-style boot and shutdown animations
+ featuring progressive ASCII art reveal with glitch effects.
+ .
+ This is an open source community project by XYBERCLAN.
+ Features:
+  - 9-frame progressive boot animation
+  - Glitchy shutdown sequence
+  - Plymouth theme integration
+  - GRUB customization
+  - Cross-distribution support
+ .
+ Join us at: https://xyber-clan.vercel.app/

@@ -25,5 +25,11 @@ Thumbs.db
 # Temporary files
 *.tmp
 /tmp/
-debian/
 *.deb
+
+# Build artifacts
+debian/xyberclan-bootloader/
+debian/.debhelper/
+debian/*.log
+debian/*.substvars
+debian/files

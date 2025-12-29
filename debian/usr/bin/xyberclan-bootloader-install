@@ -1,0 +1,13 @@
+#!/bin/bash
+# XYBERCLAN Bootloader - Installation wrapper for .deb package
+
+INSTALL_DIR="/usr/share/xyberclan-bootloader"
+
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run with sudo: sudo xyberclan-bootloader-install"
+    exit 1
+fi
+
+# Run the actual installation script
+cd "$INSTALL_DIR" || exit 1
+exec ./scripts/install.sh "$@"
