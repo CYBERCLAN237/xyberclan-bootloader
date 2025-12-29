@@ -69,22 +69,29 @@ Before installing, ensure your system meets these basic requirements:
 
 5. **Reboot** to see your new boot animation!
 
-### Method 2: Install from Source
+### Method 2: Install from Source (Universal / Arch Linux)
 
-1. **Clone the repository**:
+Recommended for **Arch Linux**, Fedora, and other distributions.
+
+1. **Install dependencies**:
+   - **Debian/Ubuntu**: `sudo apt install plymouth git`
+   - **Arch Linux**: `sudo pacman -S plymouth git`
+   - **Fedora**: `sudo dnf install plymouth git`
+
+2. **Clone the repository**:
    ```bash
    git clone https://github.com/CYBERCLAN237/xyberclan-bootloader.git
    cd xyberclan-bootloader
    ```
 
-2. **Run the installation script**:
+3. **Run the installation script**:
    ```bash
    sudo ./scripts/install.sh
    ```
 
-3. **Choose your installation method** when prompted
+4. **Choose your installation method** when prompted
 
-4. **Reboot** to see the animation
+5. **Reboot** to see the animation
 
 > [!TIP]
 ### 2. Easy Installation (Automation Script)
