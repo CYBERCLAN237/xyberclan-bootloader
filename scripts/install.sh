@@ -154,14 +154,37 @@ install_plymouth_theme() {
     # Copy logo
     cp "$PROJECT_ROOT/assets/xyberclan-logo.txt" "$THEME_DIR/"
     
-    # Set as default theme
-    plymouth-set-default-theme xyberclan
+    # Set as default theme - use multiple fallback methods
+    if command -v plymouth-set-default-theme &> /dev/null; then
+        run_with_spinner "Setting default Plymouth theme" plymouth-set-default-theme xyberclan
+    elif command -v update-alternatives &> /dev/null && [ -f /etc/alternatives/default.plymouth ]; then
+        # Fallback for systems without plymouth-set-default-theme
+        run_with_spinner "Setting default Plymouth theme (via alternatives)" update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$THEME_DIR/xyberclan.plymouth" 100
+        run_with_spinner "Configuring Plymouth theme" update-alternatives --set default.plymouth "$THEME_DIR/xyberclan.plymouth"
+    else
+        # Manual fallback - create symlink
+        echo -e "${YELLOW}Using manual theme configuration...${NC}"
+        rm -f /etc/plymouth/plymouthd.conf.d/01-xyberclan.conf 2>/dev/null || true
+        mkdir -p /etc/plymouth/plymouthd.conf.d
+        echo "[Daemon]" > /etc/plymouth/plymouthd.conf.d/01-xyberclan.conf
+        echo "Theme=xyberclan" >> /etc/plymouth/plymouthd.conf.d/01-xyberclan.conf
+        
+        # Also update the main config if it exists
+        if [ -f /etc/plymouth/plymouthd.conf ]; then
+            sed -i 's/^Theme=.*/Theme=xyberclan/' /etc/plymouth/plymouthd.conf || \
+            echo -e "\n[Daemon]\nTheme=xyberclan" >> /etc/plymouth/plymouthd.conf
+        fi
+    fi
     
     # Update initramfs
     if command -v update-initramfs &> /dev/null; then
         run_with_spinner "Updating initramfs (this may take a minute)" update-initramfs -u
     elif command -v dracut &> /dev/null; then
         run_with_spinner "Updating dracut" dracut -f
+    elif command -v mkinitcpio &> /dev/null; then
+        run_with_spinner "Updating initramfs" mkinitcpio -P
+    else
+        echo -e "${YELLOW}⚠ Could not update initramfs - theme installed but may not show until manual update${NC}"
     fi
     
     show_progress 70
