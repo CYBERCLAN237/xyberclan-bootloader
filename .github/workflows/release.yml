@@ -1,43 +1,110 @@
-name: Build and Release .deb Package
+name: Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.1)'
+        required: true
+        default: '1.0.1'
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install build dependencies
+      
+      - name: Get version
+        id: get_version
         run: |
-          sudo apt update
-          sudo apt install -y debhelper devscripts python3-pil fonts-liberation2
-
-      - name: Build Debian Package
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "TAG=v${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+            echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Update version in control file
         run: |
-          # Build only the binary package. Use -d to ignore build-dep check since we installed manually.
-          dpkg-buildpackage -us -uc -b -d
-          # Move the package to current dir for artifact upload
-          mv ../xyberclan-bootloader_*.deb .
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+          sed -i "s/Version: .*/Version: ${{ steps.get_version.outputs.VERSION }}/" debian/DEBIAN/control
+      
+      - name: Create debian package structure
+        run: |
+          mkdir -p debian/usr/share/xyberclan-bootloader/{scripts,assets,docs}
+          mkdir -p debian/usr/share/doc/xyberclan-bootloader
+          mkdir -p debian/usr/bin
+          
+          # Copy files
+          cp -r scripts/* debian/usr/share/xyberclan-bootloader/scripts/
+          cp -r assets/* debian/usr/share/xyberclan-bootloader/assets/
+          cp -r docs/* debian/usr/share/xyberclan-bootloader/docs/
+          cp README.md LICENSE debian/usr/share/doc/xyberclan-bootloader/
+          
+          # Set permissions
+          chmod 755 debian/DEBIAN/postinst
+          chmod 755 debian/usr/bin/xyberclan-bootloader-install
+          chmod +x debian/usr/share/xyberclan-bootloader/scripts/*.sh
+      
+      - name: Build .deb package
+        run: |
+          dpkg-deb --build debian xyberclan-bootloader_${{ steps.get_version.outputs.VERSION }}_all.deb
+      
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat > RELEASE_NOTES.md << 'EOF'
+          ## XYBERCLAN Bootloader ${{ steps.get_version.outputs.TAG }}
+          
+          Custom boot animation system for XYBERCLAN community members.
+          
+          ### ✨ Features
+          - 🎨 9-frame progressive ASCII boot animation
+          - 🔴 Glitchy power-off animation sequence
+          - 🎭 Hacker-style effects (matrix rain, glitch transitions)
+          - 🔧 Plymouth, GRUB, and systemd support
+          - 🐧 Cross-distribution compatibility
+          - 📦 Easy .deb package installation
+          
+          ### 🚀 Quick Install (Debian/Ubuntu)
+          ```bash
+          wget https://github.com/CYBERCLAN237/xyberclan-bootloader/releases/download/${{ steps.get_version.outputs.TAG }}/xyberclan-bootloader_${{ steps.get_version.outputs.VERSION }}_all.deb
+          sudo dpkg -i xyberclan-bootloader_${{ steps.get_version.outputs.VERSION }}_all.deb
+          sudo apt-get install -f
+          sudo xyberclan-bootloader-install
+          ```
+          
+          ### 📦 Install from Source
+          ```bash
+          git clone https://github.com/CYBERCLAN237/xyberclan-bootloader.git
+          cd xyberclan-bootloader
+          sudo ./scripts/install.sh
+          ```
+          
+          ### 🤝 Community
+          - Website: https://xyber-clan.vercel.app/
+          - GitHub: https://github.com/CYBERCLAN237
+          - Developer: @psycho237-prog
+          
+          **XYBERCLAN - for open minded**
+          EOF
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          files: xyberclan-bootloader_*.deb
-          generate_release_notes: true
+          tag_name: ${{ steps.get_version.outputs.TAG }}
+          name: XYBERCLAN Bootloader ${{ steps.get_version.outputs.TAG }}
+          body_path: RELEASE_NOTES.md
+          files: |
+            xyberclan-bootloader_${{ steps.get_version.outputs.VERSION }}_all.deb
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: xyberclan-bootloader-deb
-          path: xyberclan-bootloader_*.deb
