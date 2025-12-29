@@ -41,42 +41,52 @@ Perfect for XYBERCLAN community members who want to personalize their Linux boot
 ## 📋 Requirements
 
 Before installing, ensure your system meets these basic requirements:
-- **Operating System**: Linux (Parrot, Debian, Ubuntu, Kali, Arch, Fedora, etc.)
+- **Operating System**: Linux (Debian, Ubuntu, Parrot, Kali, Arch, Fedora, etc.)
 - **Permissions**: Root/sudo access
-- **Dependencies**: 
-  - `plymouth`: For the boot animation.
-  - `python3-pil`: Required to generate the high-quality animation frames.
-    - *On Debian/Ubuntu/Parrot:* `sudo apt install python3-pil`
+- **Boot Loader**: Plymouth (recommended) or GRUB
 
-```bash
-sudo add-apt-repository ppa:psycho237-prog/ppa
-sudo apt update
-sudo apt install xyberclan-bootloader
-```
+## 🚀 Quick Start
+
+### Method 1: Install via .deb Package (Recommended for Debian/Ubuntu)
+
+1. **Download the latest .deb package** from [Releases](https://github.com/CYBERCLAN237/xyberclan-bootloader/releases):
+   ```bash
+   wget https://github.com/CYBERCLAN237/xyberclan-bootloader/releases/download/v1.0.0/xyberclan-bootloader_1.0.0_all.deb
+   ```
+
+2. **Install the package**:
+   ```bash
+   sudo dpkg -i xyberclan-bootloader_1.0.0_all.deb
+   sudo apt-get install -f  # Install dependencies if needed
+   ```
+
+3. **Run the installer**:
+   ```bash
+   sudo xyberclan-bootloader-install
+   ```
+
+4. **Follow the on-screen prompts** and select your installation method (Plymouth recommended)
+
+5. **Reboot** to see your new boot animation!
+
+### Method 2: Install from Source
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/CYBERCLAN237/xyberclan-bootloader.git
+   cd xyberclan-bootloader
+   ```
+
+2. **Run the installation script**:
+   ```bash
+   sudo ./scripts/install.sh
+   ```
+
+3. **Choose your installation method** when prompted
+
+4. **Reboot** to see the animation
 
 > [!TIP]
-> **On Parrot OS, Kali, or Debian:** If the command above fails, use our **Robust Manual Setup**:
-> ```bash
-> # 1. Register the PPA Key
-> gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 907A43D9264119F4
-> gpg --export 907A43D9264119F4 | sudo tee /etc/apt/keyrings/xyberclan.gpg > /dev/null
-> 
-> # 2. Add Source (Architecture-specific for stability)
-> echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/xyberclan.gpg] http://ppa.launchpad.net/psycho237-prog/ppa/ubuntu noble main" | sudo tee /etc/apt/sources.list.d/xyberclan.list
-> 
-> # 3. Install
-> sudo apt update && sudo apt install xyberclan-bootloader
-> ```
-
-### 2. Manual Download (.deb)
-You can download pre-built packages from our **[Releases](https://github.com/CYBERCLAN237/xyberclan-bootloader/releases)** page.
-
-1.  Download the `.deb` file.
-2.  Install it using:
-    ```bash
-    sudo apt install ./xyberclan-bootloader_*.deb
-    ```
-
 ### 2. Easy Installation (Automation Script)
 If you prefer running a script directly:
 
