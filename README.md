@@ -16,14 +16,17 @@ Perfect for XYBERCLAN community members who want to personalize their Linux boot
 ## ✨ Features
 
 - 🎨 **Animated XYBERCLAN logo** during boot with hacker-style effects
-- 🔴 **Power-off animation** with glitchy shutdown sequence
+- 🖥️ **4K GRUB Theme**: Optimized for high-resolution displays (3840x2160)
+- ✨ **Glassmorphism Design**: Modern, semi-transparent UI for GRUB
+- 🖼️ **Premium 4K Backgrounds**: Multiple hacker-themed wallpapers included
+- 🦊 **XYBERCLAN Branding**: Sharper logo resolution and right-side positioning
 - 💬 **Custom slogan display**: "for open minded"
 - 🔧 **Multiple boot loader support**: Plymouth, GRUB, systemd-boot
 - 🐧 **Cross-distro compatibility**: Ubuntu, Fedora, Arch, Debian, and more
-- 📦 **Easy installation**: One-command setup
+- 📦 **Easy installation**: One-command setup with interactive selection
 - 🔄 **Safe uninstallation**: Restores original boot configuration
-- 🎭 **Customizable**: Adjust colors, timing, and animation style
-- 🖥️ **Hacker aesthetic**: Matrix effects, glitch transitions, system messages
+- 👁️ **Visual Preview**: Built-in safe theme preview via QEMU
+- 🎭 **Customizable**: Adjust colors, timing, and backgrounds during install
 
 ## 📸 Preview
 
@@ -144,6 +147,7 @@ xyberclan-bootloader/
 ├── scripts/
 │   ├── install.sh            # Main installation script
 │   ├── uninstall.sh          # Removal script
+│   ├── preview-grub-theme.sh # Safe theme previewer (QEMU)
 │   ├── boot-animation.sh     # Boot animation generator
 │   └── poweroff-animation.sh # Power-off animation
 ├── assets/
