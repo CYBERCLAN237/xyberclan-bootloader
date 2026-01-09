@@ -5,7 +5,7 @@ Priority: optional
 Architecture: all
 Depends: plymouth, plymouth-themes
 Recommends: grub-common
-Maintainer: psycho237-prog <psychomarlon6@gmail.com>
+Maintainer: psycho237-prog & almight <psychomarlon6@gmail.com>
 Homepage: https://github.com/CYBERCLAN237/xyberclan-bootloader
 Description: Custom boot animation for XYBERCLAN community
  XYBERCLAN Bootloader provides hacker-style boot and shutdown animations

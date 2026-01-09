@@ -71,10 +71,10 @@ cat << "EOF"
     ██╔╝ ██╗   ██║   ██████╔╝███████╗██║  ██║╚██████╗███████╗██║  ██║██║ ╚████║
     ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
     
-                              Boot Loader Installer
+                               Boot Loader Installer
 
                      Open Source Community Project by XYBERCLAN
-                          Developed by: psycho237-prog
+                          Developed by: psycho237-prog & almight
                      
                      Join us: https://xyber-clan.vercel.app/
                      GitHub:  https://github.com/CYBERCLAN237
@@ -191,7 +191,94 @@ install_plymouth_theme() {
     echo -e "${GREEN}✓ Plymouth theme installed${NC}"
 }
 
-# Customize GRUB
+# Install GRUB Theme (Glassmorphism Design)
+install_grub_theme() {
+    if [ ! -f "/etc/default/grub" ]; then
+        echo -e "${YELLOW}GRUB not found, skipping theme installation...${NC}"
+        return
+    fi
+    
+    echo -e "\n${YELLOW}Preparing to install XYBERCLAN GRUB Theme...${NC}"
+    
+    # Prompt for preview first
+    echo -e "${CYAN}Recommended: Preview the theme before installing it on your system.${NC}"
+    echo -n -e "${YELLOW}Starting SAFE preview now... (Requires QEMU)${NC}\n"
+    
+    # Run preview script as the original non-root user to ensure display access
+    if [ -n "$SUDO_USER" ]; then
+        sudo -u "$SUDO_USER" bash "$PROJECT_ROOT/scripts/preview-grub-theme.sh"
+    else
+        bash "$PROJECT_ROOT/scripts/preview-grub-theme.sh"
+    fi
+
+    echo -e "\n${YELLOW}Preview finished.${NC}"
+    echo -n -e "${YELLOW}Proceed with actual system installation? [y/N]: ${NC}"
+    if ! read -r confirm_install || [[ ! "$confirm_install" =~ ^[Yy]$ ]]; then
+        echo -e "${BLUE}Installation skipped.${NC}"
+        return
+    fi
+
+    show_progress 75
+    
+    local GRUB_THEME_SRC="$PROJECT_ROOT/grub/themes/xyberclan"
+    local GRUB_THEME_DEST="/boot/grub/themes/xyberclan"
+    
+    # Check for grub2 path (Fedora/RHEL)
+    if [ -d "/boot/grub2" ]; then
+        GRUB_THEME_DEST="/boot/grub2/themes/xyberclan"
+    fi
+    
+    # Check if theme source exists
+    if [ ! -d "$GRUB_THEME_SRC" ]; then
+        echo -e "${RED}Error: Theme source not found at $GRUB_THEME_SRC${NC}"
+        return 1
+    fi
+    
+    # Create themes directory if needed
+    mkdir -p "$(dirname "$GRUB_THEME_DEST")"
+    
+    # Copy theme files
+    echo -e "${BLUE}Copying theme files...${NC}"
+    mkdir -p "$GRUB_THEME_DEST" && cp -rf "$GRUB_THEME_SRC"/* "$GRUB_THEME_DEST/"
+    
+    show_progress 85
+    
+    # Update GRUB configuration
+    echo -e "${BLUE}Configuring GRUB theme...${NC}"
+    
+    # Backup current grub config
+    cp /etc/default/grub "$BACKUP_DIR/grub-theme-$(date +%Y%m%d-%H%M%S)"
+    
+    # Add or update GRUB_THEME
+    if grep -q "^GRUB_THEME=" /etc/default/grub; then
+        sed -i "s|^GRUB_THEME=.*|GRUB_THEME=\"$GRUB_THEME_DEST/theme.txt\"|" /etc/default/grub
+    else
+        echo "GRUB_THEME=\"$GRUB_THEME_DEST/theme.txt\"" >> /etc/default/grub
+    fi
+    
+    # Ensure GRUB_GFXMODE is set for proper resolution
+    if ! grep -q "^GRUB_GFXMODE=" /etc/default/grub; then
+        echo 'GRUB_GFXMODE="1920x1080,1280x720,auto"' >> /etc/default/grub
+    fi
+    
+    show_progress 90
+    
+    # Update GRUB
+    echo -e "${BLUE}Regenerating GRUB configuration...${NC}"
+    if command -v update-grub &> /dev/null; then
+        run_with_spinner "Updating GRUB" update-grub
+    elif command -v grub2-mkconfig &> /dev/null; then
+        run_with_spinner "Updating GRUB" grub2-mkconfig -o /boot/grub2/grub.cfg
+    elif command -v grub-mkconfig &> /dev/null; then
+        run_with_spinner "Updating GRUB" grub-mkconfig -o /boot/grub/grub.cfg
+    fi
+    
+    show_progress 95
+    echo -e "${GREEN}✓ GRUB theme installed at $GRUB_THEME_DEST${NC}"
+    echo -e "${CYAN}  Theme will appear on next reboot${NC}"
+}
+
+# Customize GRUB (legacy - just distributor name)
 customize_grub() {
     if [ ! -f "/etc/default/grub" ]; then
         echo -e "${YELLOW}GRUB not found, skipping...${NC}"
@@ -200,11 +287,6 @@ customize_grub() {
     
     echo -e "\n${YELLOW}Customizing GRUB...${NC}"
     show_progress 80
-    
-    # Add XYBERCLAN branding to GRUB
-    if ! grep -q "GRUB_DISTRIBUTOR.*XYBERCLAN" /etc/default/grub; then
-        sed -i 's/^GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="XYBERCLAN - for open minded"/' /etc/default/grub
-    fi
     
     # Update GRUB
     if command -v update-grub &> /dev/null; then
@@ -280,24 +362,28 @@ main() {
     
     echo -e "\n${CYAN}Select installation method:${NC}"
     echo "1) Plymouth theme (recommended for modern systems)"
-    echo "2) GRUB customization only"
-    echo "3) Systemd boot message"
-    echo "4) All of the above"
-    read -p "Choice [1-4]: " choice
+    echo "2) GRUB Theme - Glassmorphism (modern visual bootloader)"
+    echo "3) Reset GRUB distributor name (remove XYBERCLAN tag)"
+    echo "4) Systemd boot message"
+    echo "5) Full install: Plymouth + GRUB Theme + Systemd"
+    read -p "Choice [1-5]: " choice
     
     case $choice in
         1)
             install_plymouth_theme
             ;;
         2)
-            customize_grub
+            install_grub_theme
             ;;
         3)
-            add_systemd_message
+            customize_grub
             ;;
         4)
+            add_systemd_message
+            ;;
+        5)
             install_plymouth_theme
-            customize_grub
+            install_grub_theme
             add_systemd_message
             ;;
         *)

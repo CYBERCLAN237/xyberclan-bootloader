@@ -1,0 +1,69 @@
+# GRUB2 gfxmenu XYBERCLAN theme
+# Adaptation of Elegant Design (Window-Left-Dark)
+
+# Global Property
+title-text: ""
+desktop-image: "background.png"
+desktop-color: "#050A15"
+terminal-font: "terminus-14.pf2"
+
+# 1. XYBERCLAN Logo (Branding)
++ image {
+  top = 22%
+  left = 225
+  width = 250
+  height = 250
+  file = "logo.png"
+}
+
+# 3. Community Slogan (XYBERCLAN Branding)
++ label {
+  top = 48%
+  left = 100
+  width = 500
+  align = "center"
+  text = "for open minded"
+  font = "unifont-16.pf2"
+  color = "#4FC3F7"
+}
+
+# 4. Boot Menu (Positioned in the main area)
++ boot_menu {
+  left = 48%
+  top = 18%
+  width = 45%
+  height = 60%
+  item_font = "unifont-16.pf2"
+  item_color = "#efefef"
+  selected_item_color = "#ffffff"
+  icon_width = 32
+  icon_height = 32
+  item_icon_space = 8
+  item_height = 48
+  item_padding = 5
+  item_spacing = 8
+  selected_item_pixmap_style = "select_*.png"
+}
+
+# 5. Countdown Message
++ label {
+  top = 80%
+  left = 48%
+  width = 45%
+  align = "center"
+  id = "__timeout__"
+  text = "Booting in %d seconds"
+  color = "#ffffff"
+  font = "unifont-16.pf2"
+}
+
+# 6. Navigation Help
++ label {
+  top = 94%
+  left = 0
+  width = 100%
+  align = "center"
+  text = "[ Arrows ] Select  |  [ Enter ] Boot"
+  font = "terminus-14.pf2"
+  color = "#FFFFFF44"
+}
