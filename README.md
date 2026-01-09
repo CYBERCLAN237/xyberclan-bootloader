@@ -28,7 +28,23 @@ Perfect for XYBERCLAN community members who want to personalize their Linux boot
 - 👁️ **Visual Preview**: Built-in safe theme preview via QEMU
 - 🎭 **Customizable**: Adjust colors, timing, and backgrounds during install
 
-## 📸 Preview
+## �️ Theme Showcase
+
+### 4K GRUB Aesthetic
+The XYBERCLAN GRUB theme features a modern glassmorphism design with razor-sharp 4K scaling.
+
+| Cyber Logo Mount (Default) | Cyan Fox Matrix |
+|:---:|:---:|
+| ![Mount Right](assets/previews/mount-right.jpg) | ![Fox Matrix](assets/previews/fox-matrix.jpg) |
+| *Optimized for right-side logo placement* | *Cybernetic digital matrix style* |
+
+| Cyber Terminal | Hacker Abstract |
+|:---:|:---:|
+| ![Terminal](assets/previews/terminal.jpg) | ![Abstract](assets/previews/abstract.jpg) |
+| *Futuristic Linux terminal vibe* | *Minimalist hacker aesthetic* |
+
+
+## �📸 Preview
 
 ```
     ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗  ██████╗██╗      █████╗ ███╗   ██╗
