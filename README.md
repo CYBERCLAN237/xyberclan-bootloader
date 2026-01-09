@@ -25,7 +25,7 @@ Perfect for XYBERCLAN community members who want to personalize their Linux boot
 - 🐧 **Cross-distro compatibility**: Ubuntu, Fedora, Arch, Debian, and more
 - 📦 **Easy installation**: One-command setup with interactive selection
 - 🔄 **Safe uninstallation**: Restores original boot configuration
-- 👁️ **Visual Preview**: Built-in safe theme preview via QEMU
+- 👁️ **Visual Preview**: Built-in safe theme preview via QEMU (GRUB) or Terminal (Plymouth)
 - 🎭 **Customizable**: Adjust colors, timing, and backgrounds during install
 
 ## �️ Theme Showcase
@@ -163,7 +163,8 @@ xyberclan-bootloader/
 ├── scripts/
 │   ├── install.sh            # Main installation script
 │   ├── uninstall.sh          # Removal script
-│   ├── preview-grub-theme.sh # Safe theme previewer (QEMU)
+│   ├── preview-grub-theme.sh # Safe GRUB previewer (QEMU)
+│   ├── preview-plymouth.sh   # Safe Plymouth previewer (Terminal)
 │   ├── boot-animation.sh     # Boot animation generator
 │   └── poweroff-animation.sh # Power-off animation
 ├── assets/
