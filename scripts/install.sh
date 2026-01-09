@@ -241,6 +241,24 @@ install_grub_theme() {
     echo -e "${BLUE}Copying theme files...${NC}"
     mkdir -p "$GRUB_THEME_DEST" && cp -rf "$GRUB_THEME_SRC"/* "$GRUB_THEME_DEST/"
     
+    # Background Selection
+    echo -e "\n${CYAN}Select the default background for your GRUB theme:${NC}"
+    options=($(ls "$GRUB_THEME_SRC" | grep -E '\.(png|jpg|jpeg)$' | grep -v 'logo' | grep -v 'select' | grep -v 'menu' | grep -v 'info'))
+    
+    if [ ${#options[@]} -gt 0 ]; then
+        for i in "${!options[@]}"; do
+            echo -e "  $((i+1))) ${options[$i]}"
+        done
+        echo -n -e "\nEnter choice [1-${#options[@]}]: "
+        read -r bg_choice
+        
+        if [[ "$bg_choice" -gt 0 && "$bg_choice" -le "${#options[@]}" ]]; then
+            SELECTED_BG="${options[$((bg_choice-1))]}"
+            echo -e "${GREEN}Default background set to: $SELECTED_BG${NC}"
+            sed -i "s/^desktop-image: .*/desktop-image: \"$SELECTED_BG\"/" "$GRUB_THEME_DEST/theme.txt"
+        fi
+    fi
+    
     show_progress 85
     
     # Update GRUB configuration

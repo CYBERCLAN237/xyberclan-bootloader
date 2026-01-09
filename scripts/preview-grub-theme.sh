@@ -122,10 +122,50 @@ main() {
         exit 1
     fi
 
-    echo -e "\n${GREEN}Starting preview for $THEME_DIR...${NC}"
+    # Background Selection
+    BG_FILE=""
+    if [ -n "$1" ]; then
+        if [ -f "$THEME_DIR/$1" ]; then
+            BG_FILE="$1"
+        else
+            echo -e "${RED}Warning: Background '$1' not found in $THEME_DIR. Using selector.${NC}"
+        fi
+    fi
+
+    if [ -z "$BG_FILE" ]; then
+        echo -e "${YELLOW}Select a background to preview:${NC}"
+        options=($(ls "$THEME_DIR" | grep -E '\.(png|jpg|jpeg)$' | grep -v 'logo' | grep -v 'select' | grep -v 'menu' | grep -v 'info'))
+        
+        if [ ${#options[@]} -eq 0 ]; then
+            echo -e "${RED}No backgrounds found in $THEME_DIR${NC}"
+            exit 1
+        fi
+
+        for i in "${!options[@]}"; do
+            echo -e "  $((i+1))) ${options[$i]}"
+        done
+        
+        echo -n -e "\nEnter choice [1-${#options[@]}]: "
+        read -r choice
+        
+        if [[ "$choice" -gt 0 && "$choice" -le "${#options[@]}" ]]; then
+            BG_FILE="${options[$((choice-1))]}"
+        else
+            BG_FILE="${options[0]}"
+            echo -e "${BLUE}Defaulting to: $BG_FILE${NC}"
+        fi
+    fi
+
+    # Update theme.txt temporarily with the selected background
+    # We use a backup to restore it afterwards
+    THEME_TXT="$THEME_DIR/theme.txt"
+    cp "$THEME_TXT" "$THEME_TXT.bak"
+    sed -i "s/^desktop-image: .*/desktop-image: \"$BG_FILE\"/" "$THEME_TXT"
+
+    echo -e "\n${GREEN}Starting 4K preview with background: $BG_FILE...${NC}"
     
-    # Run the preview
-    if ! "$PREVIEW_BIN" "$THEME_DIR"; then
+    # Run the preview in 4K
+    if ! "$PREVIEW_BIN" --resolution 3840x2160 "$THEME_DIR"; then
         echo -e "\n${RED}ERROR: The preview failed to start.${NC}"
         echo -e "${YELLOW}Common reasons:${NC}"
         echo -e "1. You are running as 'root' and QEMU cannot access your display."
@@ -133,8 +173,12 @@ main() {
         echo -e "3. KVM or virtualization is disabled in your BIOS."
         echo -e "\n${CYAN}Try running this command as a normal user (not sudo):${NC}"
         echo -e "  ./scripts/preview-grub-theme.sh"
+        mv "$THEME_TXT.bak" "$THEME_TXT"
         exit 1
     fi
+
+    # Restore theme.txt
+    mv "$THEME_TXT.bak" "$THEME_TXT"
 }
 
 main "$@"
