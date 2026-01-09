@@ -25,7 +25,7 @@ terminal-font: "terminus-18.pf2"
   width = 100%
   align = "center"
   text = "for open minded"
-  font = "unifont-32.pf2"
+  font = "unifont-24.pf2"
   color = "#4FC3F7"
 }
 
@@ -35,15 +35,15 @@ terminal-font: "terminus-18.pf2"
   top = 18%
   width = 40%
   height = 40%
-  item_font = "unifont-32.pf2"
+  item_font = "unifont-24.pf2"
   item_color = "#efefef"
   selected_item_color = "#ffffff"
-  icon_width = 64
-  icon_height = 64
-  item_icon_space = 16
-  item_height = 96
-  item_padding = 10
-  item_spacing = 16
+  icon_width = 48
+  icon_height = 48
+  item_icon_space = 12
+  item_height = 72
+  item_padding = 8
+  item_spacing = 12
   selected_item_pixmap_style = "select_*.png"
 }
 
@@ -56,7 +56,7 @@ terminal-font: "terminus-18.pf2"
   id = "__timeout__"
   text = "Booting in %d seconds"
   color = "#ffffff"
-  font = "unifont-32.pf2"
+  font = "unifont-24.pf2"
 }
 
 # 6. Navigation Help
@@ -66,6 +66,6 @@ terminal-font: "terminus-18.pf2"
   width = 100%
   align = "center"
   text = "[ Arrows ] Select  |  [ Enter ] Boot"
-  font = "terminus-18.pf2"
+  font = "terminus-14.pf2"
   color = "#FFFFFF44"
 }
