@@ -4,24 +4,24 @@
 # Global Property
 title-text: ""
 desktop-image: "background.png"
-desktop-color: "#050A15"
+desktop-color: "#111D29"
 terminal-font: "terminus-14.pf2"
 
 # 1. XYBERCLAN Logo (Branding)
 + image {
-  top = 22%
-  left = 225
-  width = 250
-  height = 250
+  top = 8%
+  left = 8%
+  width = 180
+  height = 180
   file = "logo.png"
 }
 
 # 3. Community Slogan (XYBERCLAN Branding)
 + label {
-  top = 48%
-  left = 100
-  width = 500
-  align = "center"
+  top = 40%
+  left = 8%
+  width = 350
+  align = "left"
   text = "for open minded"
   font = "unifont-16.pf2"
   color = "#4FC3F7"
@@ -29,10 +29,10 @@ terminal-font: "terminus-14.pf2"
 
 # 4. Boot Menu (Positioned in the main area)
 + boot_menu {
-  left = 48%
-  top = 18%
-  width = 45%
-  height = 60%
+  left = 8%
+  top = 48%
+  width = 40%
+  height = 40%
   item_font = "unifont-16.pf2"
   item_color = "#efefef"
   selected_item_color = "#ffffff"
@@ -47,10 +47,10 @@ terminal-font: "terminus-14.pf2"
 
 # 5. Countdown Message
 + label {
-  top = 80%
-  left = 48%
-  width = 45%
-  align = "center"
+  top = 90%
+  left = 8%
+  width = 40%
+  align = "left"
   id = "__timeout__"
   text = "Booting in %d seconds"
   color = "#ffffff"
