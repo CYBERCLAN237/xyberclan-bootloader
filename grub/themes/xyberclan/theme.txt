@@ -4,14 +4,14 @@
 
 # Global Property
 title-text: ""
-desktop-image: "bg_cyber_logo_mount_right.jpg"
+desktop-image: "bg_hacker_abstract.jpg"
 desktop-color: "#111D29"
 terminal-font: "terminus-18.pf2"
 
 # 1. XYBERCLAN Logo (Branding)
 + image {
-  top = 65%
-  left = 82%
+  top = 5%
+  left = 47%
   width = 250
   height = 250
   file = "logo.png"

@@ -304,8 +304,18 @@ generate_plymouth_theme() {
     # Check for Python 3 and PIL
     if ! python3 -c "import PIL" 2>/dev/null; then
         echo -e "${RED}Error: Python 3 PIL (Pillow) library not found.${NC}"
-        echo -e "${YELLOW}Please install it: sudo apt install python3-pil${NC}"
+        echo -e "${YELLOW}This is required to generate the Plymouth theme images.${NC}"
+        echo -e "${CYAN}Please install it using the installer or manually:${NC}"
+        echo -e "  Arch:   sudo pacman -S python-pillow"
+        echo -e "  Debian: sudo apt install python3-pil"
+        echo -e "  Fedora: sudo dnf install python3-pillow"
         return 1
+    fi
+
+    # Check for Plymouth script module
+    if [ ! -f "/usr/lib/plymouth/script.so" ] && [ ! -f "/usr/lib64/plymouth/script.so" ] && [ ! -f "/usr/lib/x86_64-linux-gnu/plymouth/script.so" ]; then
+        echo -e "${YELLOW}Warning: Plymouth 'script' module not found.${NC}"
+        echo -e "${YELLOW}This is required for the theme to display correctly.${NC}"
     fi
 
     # Find a suitable font
@@ -378,16 +388,17 @@ def generate_image(text, color, output_path, font_path, size=24):
     img.save(output_path)
 
 if __name__ == "__main__":
-    # Args: text_file color output_file font_path
+    # Args: text_file color output_file font_path [size]
     text_file = sys.argv[1]
     color = sys.argv[2]
     output_file = sys.argv[3]
     font_path = sys.argv[4]
+    size = int(sys.argv[5]) if len(sys.argv) > 5 else 24
     
     with open(text_file, 'r') as f:
         text = f.read()
         
-    generate_image(text, color, output_file, font_path)
+    generate_image(text, color, output_file, font_path, size)
 EOF
 
     # Generate PNGs for each frame

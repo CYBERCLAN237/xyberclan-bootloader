@@ -52,7 +52,16 @@ show_spinner() {
         printf "\r${BLUE}%s... ${CYAN}%s${NC}" "$message" "${spin:$i:1}"
         sleep 0.1
     done
-    printf "\r${BLUE}%s... ${GREEN}Done!${NC}\n" "$message"
+    
+    wait "$pid"
+    local status=$?
+    
+    if [ $status -eq 0 ]; then
+        printf "\r${BLUE}%s... ${GREEN}Done!${NC}\n" "$message"
+    else
+        printf "\r${BLUE}%s... ${RED}Failed! (Exit code: $status)${NC}\n" "$message"
+    fi
+    return $status
 }
 
 run_with_spinner() {
@@ -135,6 +144,73 @@ check_dependencies() {
             if command -v plymouth &> /dev/null; then
                 echo -e "${GREEN}✓ Plymouth installed successfully${NC}"
                 HAS_PLYMOUTH=true
+            fi
+        fi
+    fi
+
+    # Check for Plymouth Script Plugin (Required for the animations to work)
+    local script_plugin="/usr/lib/plymouth/script.so"
+    [ ! -f "$script_plugin" ] && script_plugin="/usr/lib64/plymouth/script.so"
+    [ ! -f "$script_plugin" ] && script_plugin="/usr/lib/x86_64-linux-gnu/plymouth/script.so"
+
+    if [ -f "$script_plugin" ]; then
+        echo -e "${GREEN}✓ Plymouth Script plugin found${NC}"
+    else
+        echo -e "${YELLOW}! Plymouth Script plugin not found (Critical for animations)${NC}"
+        echo -ne "${CYAN}Would you like to install the script plugin? (y/N): ${NC}"
+        read -r install_plugin
+        if [[ "$install_plugin" =~ ^[Yy]$ ]]; then
+            echo -e "${BLUE}Installing Plymouth Script plugin...${NC}"
+            case $DISTRO in
+                arch|manjaro)
+                    # Often included in plymouth package in Arch
+                    echo -e "${YELLOW}On Arch, ensure 'plymouth' is fully installed.${NC}"
+                    ;;
+                debian|ubuntu|kali|parrot|raspbian)
+                    apt-get update && apt-get install -y plymouth-label
+                    # Some versions need plymouth-themes or similar for scripts
+                    apt-get install -y plymouth-themes || true
+                    ;;
+                fedora|rhel|centos)
+                    dnf install -y plymouth-plugin-script
+                    ;;
+                *)
+                    echo -e "${RED}Manual installation of 'plymouth-plugin-script' required.${NC}"
+                    ;;
+            esac
+        fi
+    fi
+
+    # Check and Install Python PIL (Required for theme generation)
+    if python3 -c "import PIL" &> /dev/null; then
+        echo -e "${GREEN}✓ Python PIL (Pillow) found${NC}"
+    else
+        echo -e "${YELLOW}! Python PIL (Pillow) not found (Required for theme generation)${NC}"
+        echo -ne "${CYAN}Would you like to install it? (y/N): ${NC}"
+        read -r install_pil
+        if [[ "$install_pil" =~ ^[Yy]$ ]]; then
+            echo -e "${BLUE}Installing Python PIL...${NC}"
+            case $DISTRO in
+                arch|manjaro)
+                    pacman -S --noconfirm python-pillow
+                    ;;
+                debian|ubuntu|kali|parrot|raspbian)
+                    apt-get update && apt-get install -y python3-pil
+                    ;;
+                fedora|rhel|centos)
+                    dnf install -y python3-pillow
+                    ;;
+                opensuse*)
+                    zypper install -y python3-Pillow
+                    ;;
+                *)
+                    echo -e "${RED}Manual installation of 'python3-pil' or 'python-pillow' required.${NC}"
+                    ;;
+            esac
+            if python3 -c "import PIL" &> /dev/null; then
+                echo -e "${GREEN}✓ Python PIL installed successfully${NC}"
+            else
+                echo -e "${RED}Error: Failed to install Python PIL. Plymouth theme generation will fail.${NC}"
             fi
         fi
     fi
@@ -281,6 +357,15 @@ install_grub_theme() {
     echo -e "${BLUE}Copying theme files...${NC}"
     mkdir -p "$GRUB_THEME_DEST" && cp -rf "$GRUB_THEME_SRC"/* "$GRUB_THEME_DEST/"
     
+    # Verify fonts exist in destination
+    echo -e "${BLUE}Verifying font files...${NC}"
+    for font in "terminus-12.pf2" "terminus-18.pf2" "unifont-16.pf2"; do
+        if [ ! -f "$GRUB_THEME_DEST/$font" ]; then
+            echo -e "${YELLOW}Warning: Font $font not found in destination. Retrying explicit copy...${NC}"
+            cp "$GRUB_THEME_SRC/$font" "$GRUB_THEME_DEST/" || true
+        fi
+    done
+    
     # Background Selection
     echo -e "\n${CYAN}Select the default background for your GRUB theme:${NC}"
     options=($(ls "$GRUB_THEME_SRC" | grep -E '\.(png|jpg|jpeg)$' | grep -v 'logo' | grep -v 'select' | grep -v 'menu' | grep -v 'info'))
@@ -364,21 +449,29 @@ add_systemd_message() {
     echo -e "\n${YELLOW}Adding systemd boot message...${NC}"
     show_progress 90
     
+    # Relocate scripts to a system-wide location for early boot access
+    INSTALL_DIR="/usr/share/xyberclan-bootloader"
+    mkdir -p "$INSTALL_DIR"
+    cp "$SCRIPT_DIR/boot-animation.sh" "$INSTALL_DIR/"
+    cp "$SCRIPT_DIR/boot-animation-classic.sh" "$INSTALL_DIR/"
+    chmod +x "$INSTALL_DIR"/*.sh
+
     # Create a service that displays the XYBERCLAN logo
     cat > /etc/systemd/system/xyberclan-boot.service <<EOF
 [Unit]
 Description=XYBERCLAN Boot Animation
 DefaultDependencies=no
+After=plymouth-start.service
 Before=display-manager.service
 
 [Service]
 Type=oneshot
-ExecStart=$SCRIPT_DIR/boot-animation.sh
+ExecStart=$INSTALL_DIR/boot-animation.sh
 StandardOutput=journal+console
 StandardError=journal+console
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=sysinit.target
 EOF
     
     systemctl daemon-reload
