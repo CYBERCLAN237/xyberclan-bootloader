@@ -140,14 +140,29 @@ install_plymouth_theme() {
         return
     fi
     
-    echo -e "\n${YELLOW}Installing Plymouth theme...${NC}"
+    echo -e "\n${CYAN}Select Plymouth Theme Style:${NC}"
+    echo "1) Hacker Style (Centered logo, matrix effects - Original)"
+    echo "2) Classic Style (Logo on top, loading spinner below - New)"
+    read -p "Choice [1-2]: " plymouth_choice
+    
+    local anim_script="$SCRIPT_DIR/boot-animation.sh"
+    [ "$plymouth_choice" == "2" ] && anim_script="$SCRIPT_DIR/boot-animation-classic.sh"
+    
+    echo -e "\n${CYAN}Would you like to preview the theme before installing?${NC}"
+    read -p "Preview? (y/N): " do_preview
+    if [[ "$do_preview" =~ ^[Yy]$ ]]; then
+        bash "$anim_script"
+        echo -e "\n${YELLOW}Press Enter to continue with installation...${NC}"
+        read -r
+    fi
+
     show_progress 30
     
     THEME_DIR="/usr/share/plymouth/themes/xyberclan"
     mkdir -p "$THEME_DIR"
     
     # Generate Plymouth theme files
-    source "$SCRIPT_DIR/boot-animation.sh"
+    source "$anim_script"
     run_with_spinner "Generating theme components" generate_plymouth_theme "$THEME_DIR"
     show_progress 50
     
@@ -351,19 +366,23 @@ EOF
 # Test animation after installation
 test_animation() {
     echo -e "\n${CYAN}Would you like to test the animations now? (No reboot required)${NC}"
-    echo "1) Test Boot Animation"
-    echo "2) Test Power-Off Animation"
-    echo "3) Skip testing"
-    read -p "Choice [1-3]: " test_choice
+    echo "1) Test Boot Animation (Hacker Style)"
+    echo "2) Test Boot Animation (Classic Style)"
+    echo "3) Test Power-Off Animation"
+    echo "4) Skip testing"
+    read -p "Choice [1-4]: " test_choice
     
     case $test_choice in
         1)
             bash "$SCRIPT_DIR/boot-animation.sh"
             ;;
         2)
-            bash "$SCRIPT_DIR/poweroff-animation.sh"
+            bash "$SCRIPT_DIR/boot-animation-classic.sh"
             ;;
         3)
+            bash "$SCRIPT_DIR/poweroff-animation.sh"
+            ;;
+        4)
             return
             ;;
         *)

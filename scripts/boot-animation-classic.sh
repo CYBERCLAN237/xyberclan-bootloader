@@ -414,8 +414,15 @@ EOF
     python3 "$theme_dir/gen_image.py" "/tmp/xyber_slogan.txt" "#33ccff" "$theme_dir/slogan.png" "$FONT_PATH"
     rm "/tmp/xyber_slogan.txt"
     
+    # Generate Spinner Frames (Classic Hacker Look)
+    SPINNER_CHARS=("|" "/" "-" "\\")
+    for i in "${!SPINNER_CHARS[@]}"; do
+        echo "${SPINNER_CHARS[$i]}" > "/tmp/xyber_spin_$i.txt"
+        python3 "$theme_dir/gen_image.py" "/tmp/xyber_spin_$i.txt" "#00ff00" "$theme_dir/spinner$i.png" "$FONT_PATH" 48
+        rm "/tmp/xyber_spin_$i.txt"
+    done
+    
     # Cleanup python script
-    rm "$theme_dir/gen_image.py"
     rm "$theme_dir/gen_image.py"
 
     # Write the Plymouth script
@@ -433,24 +440,44 @@ for (i = 1; i <= 9; i++) {
 frame9_glitch = Image("frame9_glitch.png");
 slogan_image = Image("slogan.png");
 
+spinner_images = [];
+for (i = 0; i < 4; i++) {
+    spinner_images[i] = Image("spinner" + i + ".png");
+}
+
 # Create Sprite
 logo_sprite = Sprite();
 slogan_sprite = Sprite(slogan_image);
 slogan_sprite.SetOpacity(0);
 
-# Center Calculation Function
+spinner_sprite = Sprite();
+spinner_sprite.SetOpacity(0);
+
+# Position Logic
+fun position_elements() {
+    # Logo on Top (30% down)
+    logo_w = frame_images[9].GetWidth();
+    logo_h = frame_images[9].GetHeight();
+    logo_sprite.SetX(Window.GetWidth() / 2 - logo_w / 2);
+    logo_sprite.SetY(Window.GetHeight() * 0.3 - logo_h / 2);
+    
+    # Slogan slightly below logo
+    slogan_sprite.SetX(Window.GetWidth() / 2 - slogan_image.GetWidth() / 2);
+    slogan_sprite.SetY(Window.GetHeight() * 0.3 + logo_h / 2 + 20);
+    
+    # Spinner in the Middle-Bottom (65% down)
+    spinner_sprite.SetX(Window.GetWidth() / 2 - spinner_images[0].GetWidth() / 2);
+    spinner_sprite.SetY(Window.GetHeight() * 0.65);
+}
+
+# Center Calculation Function (Fallback legacy)
 fun center_sprite(spr, img) {
     spr.SetImage(img);
-    spr.SetX(Window.GetWidth() / 2 - img.GetWidth() / 2);
-    spr.SetY(Window.GetHeight() / 2 - img.GetHeight() / 2);
 }
 
 # Initial State
-center_sprite(logo_sprite, frame_images[1]);
-
-# Position slogan below logo
-slogan_sprite.SetX(Window.GetWidth() / 2 - slogan_image.GetWidth() / 2);
-slogan_sprite.SetY(Window.GetHeight() / 2 + 120);
+logo_sprite.SetImage(frame_images[1]);
+position_elements();
 
 progress = 0;
 current_frame = 1;
@@ -461,22 +488,31 @@ fun refresh_callback() {
     # Animate frames every 8 ticks
     if (progress % 8 == 0 && current_frame < 9) {
         current_frame++;
-        center_sprite(logo_sprite, frame_images[current_frame]);
+        logo_sprite.SetImage(frame_images[current_frame]);
     }
     
-    # Reveal slogan after logo finishes
+    # Reveal slogan & spinner after logo finishes
     if (current_frame == 9 && progress > 80) {
         op = slogan_sprite.GetOpacity();
-        if (op < 1.0) slogan_sprite.SetOpacity(op + 0.05);
+        if (op < 1.0) {
+            slogan_sprite.SetOpacity(op + 0.05);
+            spinner_sprite.SetOpacity(op + 0.05);
+        }
+    }
+    
+    # Animate Spinner
+    if (progress % 5 == 0) {
+        spin_idx = (progress / 5) % 4;
+        spinner_sprite.SetImage(spinner_images[spin_idx]);
     }
     
     # Glitch effect on final frame
     if (current_frame == 9 && progress % 20 == 0) {
         r = Math.Random();
         if (r > 0.8) {
-            center_sprite(logo_sprite, frame9_glitch);
+            logo_sprite.SetImage(frame9_glitch);
         } else {
-            center_sprite(logo_sprite, frame_images[9]);
+            logo_sprite.SetImage(frame_images[9]);
         }
     }
 }
