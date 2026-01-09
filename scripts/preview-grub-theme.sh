@@ -178,7 +178,9 @@ main() {
     fi
 
     # Restore theme.txt
-    mv "$THEME_TXT.bak" "$THEME_TXT"
+    if [ -f "$THEME_TXT.bak" ]; then
+        mv "$THEME_TXT.bak" "$THEME_TXT"
+    fi
 }
 
 main "$@"

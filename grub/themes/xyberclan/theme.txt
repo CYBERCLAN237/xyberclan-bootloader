@@ -4,19 +4,18 @@
 
 # Global Property
 title-text: ""
-desktop-image: "bg_hacker_den.jpg"
+desktop-image: "bg_cyber_logo_mount_right.jpg"
 desktop-color: "#111D29"
 terminal-font: "terminus-18.pf2"
 
 # 1. XYBERCLAN Logo (Branding)
-# Hidden as per user request ("remouve gemini log")
-# + image {
-#   top = 65%
-#   left = 8%
-#   width = 300
-#   height = 300
-#   file = "logo.png"
-# }
++ image {
+  top = 65%
+  left = 82%
+  width = 250
+  height = 250
+  file = "logo.png"
+}
 
 # 3. Community Slogan (XYBERCLAN Branding)
 + label {
@@ -25,7 +24,7 @@ terminal-font: "terminus-18.pf2"
   width = 100%
   align = "center"
   text = "for open minded"
-  font = "unifont-24.pf2"
+  font = "unifont-16.pf2"
   color = "#4FC3F7"
 }
 
@@ -35,15 +34,15 @@ terminal-font: "terminus-18.pf2"
   top = 18%
   width = 40%
   height = 40%
-  item_font = "unifont-24.pf2"
+  item_font = "unifont-16.pf2"
   item_color = "#efefef"
   selected_item_color = "#ffffff"
   icon_width = 48
   icon_height = 48
   item_icon_space = 12
-  item_height = 72
+  item_height = 48
   item_padding = 8
-  item_spacing = 12
+  item_spacing = 8
   selected_item_pixmap_style = "select_*.png"
 }
 
@@ -56,7 +55,7 @@ terminal-font: "terminus-18.pf2"
   id = "__timeout__"
   text = "Booting in %d seconds"
   color = "#ffffff"
-  font = "unifont-24.pf2"
+  font = "unifont-16.pf2"
 }
 
 # 6. Navigation Help
@@ -66,6 +65,6 @@ terminal-font: "terminus-18.pf2"
   width = 100%
   align = "center"
   text = "[ Arrows ] Select  |  [ Enter ] Boot"
-  font = "terminus-14.pf2"
+  font = "terminus-12.pf2"
   color = "#FFFFFF44"
 }
