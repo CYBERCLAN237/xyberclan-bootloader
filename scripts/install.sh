@@ -104,14 +104,39 @@ detect_distro() {
     show_progress 10
 }
 
-# Check for Plymouth
-check_plymouth() {
+# Check and Install dependencies
+check_dependencies() {
     if command -v plymouth &> /dev/null; then
         echo -e "${GREEN}✓ Plymouth found${NC}"
         HAS_PLYMOUTH=true
     else
         echo -e "${YELLOW}! Plymouth not found${NC}"
         HAS_PLYMOUTH=false
+        
+        echo -ne "${CYAN}Would you like to install Plymouth? (y/N): ${NC}"
+        read -r install_dep
+        if [[ "$install_dep" =~ ^[Yy]$ ]]; then
+            echo -e "${BLUE}Installing Plymouth...${NC}"
+            case $DISTRO in
+                arch|manjaro)
+                    pacman -S --noconfirm plymouth
+                    ;;
+                debian|ubuntu|kali|parrot|raspbian)
+                    apt-get update && apt-get install -y plymouth
+                    ;;
+                fedora|rhel|centos)
+                    dnf install -y plymouth
+                    ;;
+                *)
+                    echo -e "${RED}Manual installation of 'plymouth' required for your distribution.${NC}"
+                    return
+                    ;;
+            esac
+            if command -v plymouth &> /dev/null; then
+                echo -e "${GREEN}✓ Plymouth installed successfully${NC}"
+                HAS_PLYMOUTH=true
+            fi
+        fi
     fi
 }
 
@@ -394,7 +419,7 @@ test_animation() {
 # Main installation
 main() {
     detect_distro
-    check_plymouth
+    check_dependencies
     create_backup
     
     echo -e "\n${CYAN}Select installation method:${NC}"
